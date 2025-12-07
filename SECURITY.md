@@ -14,7 +14,7 @@
 If you find a serious issue (crashes, weird behaviour, or anything unsafe), **do not post it publicly**.
 
 Please report it privately through:
-- **Email:** security@lullabydownbelow.dev  
+- **Email:** NULL(hehe)  
 - **GitHub:** “Report a vulnerability” option  
 - **Telegram:** Contact the project owner (listed in the repository)
 
