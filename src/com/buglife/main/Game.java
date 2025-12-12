@@ -17,24 +17,6 @@ public class Game implements Runnable {
     private SoundManager soundManager;
     volatile boolean running = false;
 
-    // In Game.java
-    // private void initWindow() {
-    //     JFrame window = new JFrame("Lullaby Down Below");
-    //     window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-    //     soundManager = new SoundManager();
-    //     gamePanel = new GamePanel(soundManager);
-    //     window.add(gamePanel);
-        
-    //     window.pack();
-    //     window.setLocationRelativeTo(null);
-    //     window.setVisible(true);
-
-    //     // --- ADD THIS LINE ---
-    //     // After the window is visible, explicitly request focus for the GamePanel.
-    //     gamePanel.requestFocusInWindow();
-    // }
-
     public Game() {
         // 1. Load assets first
         loadCustomFont();
