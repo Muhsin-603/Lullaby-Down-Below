@@ -25,7 +25,7 @@ public class Player {
     private double x, y;
     private int width, height;
     private double currentSpeed; // How fast we are moving RIGHT NOW
-    private final double NORMAL_SPEED = 2.3; // The default speed
+    private final double NORMAL_SPEED = 1.8; // The default speed
     private final double SLOW_SPEED = 0.5; // The speed when stuck!
 
     private final double BOOST_SPEED = 4.0; // Zoom!
