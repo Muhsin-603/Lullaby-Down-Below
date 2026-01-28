@@ -159,7 +159,7 @@ mvn exec:java -Dexec.mainClass="com.buglife.main.Game"
 
 **Option B: Direct JAR Execution**
 ```bash
-java -jar target/lullaby-down-below-1.0.0-jar-with-dependencies.jar
+java -jar target/lullaby-down-below-1.5.0-jar-with-dependencies.jar
 ```
 
 **Option C: From IDE**
