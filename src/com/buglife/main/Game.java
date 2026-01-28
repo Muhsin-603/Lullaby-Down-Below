@@ -45,29 +45,17 @@ public class Game implements Runnable {
         // 5. CRITICAL: Request keyboard focus AFTER the window is visible/fullscreen.
         // This is the most reliable way to ensure key presses are heard.
         gamePanel.requestFocusInWindow();
-
-        System.out.println("Game initialized successfully in fullscreen mode.");
     }
 
     private void loadCustomFont() {
-        try {
-            // Get the font file from our resources folder
-            InputStream is = getClass().getResourceAsStream("/res/fonts/Tiny5.ttf");
+        try (InputStream is = getClass().getResourceAsStream("/res/fonts/Tiny5.ttf")) {
             if (is == null) {
                 System.err.println("ERROR: Font file not found!");
                 return;
             }
 
-            // Create the font object
-            Tiny5 = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(12f); // Load with a base size (e.g., 12pt)
-
-            // Register the font with the system's graphics environment
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            ge.registerFont(Tiny5);
-
-            is.close(); // Close the stream
-            System.out.println("Custom font loaded successfully!");
-
+            Tiny5 = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(12f);
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Tiny5);
         } catch (IOException | FontFormatException e) {
             System.err.println("ERROR: Failed to load custom font!");
             e.printStackTrace();
@@ -86,43 +74,30 @@ public class Game implements Runnable {
     /**
      * This is the Game Loop. It will run continuously.
      */
-                @Override
+    @Override
     public void run() {
-        double drawInterval = 1_000_000_000.0 / FPS;
-        double delta = 0;
-        long lastTime = System.nanoTime();
-        long currentTime;
+        final double timePerFrame = 1_000_000_000.0 / FPS;
 
         while (running) {
-            currentTime = System.nanoTime();
-            delta += (currentTime - lastTime) / drawInterval;
-            lastTime = currentTime;
+            long frameStart = System.nanoTime();
 
-            if (delta >= 1) {
-                long frameStart = System.nanoTime();
+            // Update and render
+            gamePanel.updateGame();
+            gamePanel.repaint();
+            Toolkit.getDefaultToolkit().sync();
 
-                // 1. UPDATE: Update all game logic
-                gamePanel.updateGame();
+            // Calculate and apply frame limiting
+            long workTime = System.nanoTime() - frameStart;
+            long sleepTime = (long) (timePerFrame - workTime);
 
-                // 2. DRAW: Use paintImmediately instead
-                gamePanel.repaint();
-
-                delta--;
-
-                // --- FRAME CAP TO 60 FPS ---
-                long frameEnd = System.nanoTime();
-                long frameTime = frameEnd - frameStart;
-                long targetFrameTime = (long) drawInterval;
-                if (frameTime < targetFrameTime) {
-                    try {
-                        long sleepMillis = (targetFrameTime - frameTime) / 1_000_000;
-                        int sleepNanos = (int) ((targetFrameTime - frameTime) % 1_000_000);
-                        if (sleepMillis > 0 || sleepNanos > 0) {
-                            Thread.sleep(sleepMillis, sleepNanos);
-                        }
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
+            if (sleepTime > 0) {
+                try {
+                    long millis = sleepTime / 1_000_000;
+                    int nanos = (int) (sleepTime % 1_000_000);
+                    Thread.sleep(millis, nanos);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
                 }
             }
         }
@@ -133,45 +108,27 @@ public class Game implements Runnable {
      */
     // In Game.java
     public void cleanup() {
-        System.out.println("Cleanup requested..."); // Add more logging
-        running = false; // Signal the game loop to stop
+        running = false;
 
-        // Wait for the game thread to actually finish
         try {
             if (gameThread != null && gameThread.isAlive()) {
-                System.out.println("Waiting for game thread to stop...");
-                gameThread.join(500); // Wait up to 500ms
+                gameThread.join(500);
                 if (gameThread.isAlive()) {
                     System.err.println("Warning: Game thread did not stop cleanly.");
-                    // Consider thread interruption if needed, but join is usually enough
-                    // gameThread.interrupt();
-                } else {
-                    System.out.println("Game thread stopped.");
                 }
             }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // Restore interrupt status
-            System.err.println("Interrupted while waiting for game thread.");
+            Thread.currentThread().interrupt();
         }
-        gameThread = null; // Okay to set to null after join
+        gameThread = null;
 
-        // Stop sounds
         if (soundManager != null) {
-            System.out.println("Stopping sounds...");
             soundManager.stopAllSounds();
-            // Consider adding a method to SoundManager to explicitly close Clips if
-            // necessary
-            // soundManager.closeAllClips();
         }
 
-        // Dispose window
         if (window != null) {
-            System.out.println("Disposing window...");
-            // Ensure this runs on the EDT if called from shutdown hook
             SwingUtilities.invokeLater(() -> window.dispose());
-            // window.dispose(); // This might cause issues if called from non-EDT thread
         }
-        System.out.println("Cleanup finished.");
     }
 
     public static void main(String[] args) {

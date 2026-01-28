@@ -295,25 +295,19 @@ public class Spider {
                         }
 
                         rotationAngle = Math.toDegrees(Math.atan2(moveY, moveX)) + 90;
-                    } else {
-                        // We reached the toy. Just hang out until it stops making noise.
-                        System.out.println("SPIDER: Found the noise source!");
                     }
                     if (canSeePlayer(targetPlayer, world)) {
                         double dxPlayer = targetPlayer.getCenterX() - getCenterX();
                         double dyPlayer = targetPlayer.getCenterY() - getCenterY();
                         double distToPlayer = Math.sqrt(dxPlayer * dxPlayer + dyPlayer * dyPlayer);
 
-                        if (distToPlayer < 80) { // Very close
-                            System.out.println("SPIDER: WAIT, THAT'S NOT THE NOISE!");
+                        if (distToPlayer < 80) {
                             currentState = SpiderState.CHASING;
                             soundManager.stopSound("music");
                             soundManager.playSound("chasing");
                             loseSightTimer = 300;
                         }
                     } else {
-                        // Toy stopped making noise. Go back to work.
-                        System.out.println("SPIDER: Must have been the wind.");
                         currentState = SpiderState.RETURNING;
                         this.returnPoint = new Point(getCenterX(), getCenterY());
                     }

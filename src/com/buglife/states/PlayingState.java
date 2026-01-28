@@ -125,7 +125,6 @@ public class PlayingState extends GameState {
             }
 
             if (canTeleport) {
-                System.out.println("Snail teleporting to location " + nextSnailLocationIndex);
                 snail.teleportToLocation(nextSnailLocationIndex);
                 nextSnailLocationIndex = (nextSnailLocationIndex + 1) % snail.getLocationsCount();
                 snailHasTeleported = true;
@@ -139,7 +138,6 @@ public class PlayingState extends GameState {
 
             if (wire.checkCollision(player)) {
                 soundManager.playSound("webbed");
-                System.out.println("CLUMS! Player tripped a wire!");
 
                 Point noiseLocation = new Point(wire.getX() + 16, wire.getY() + 16);
                 int radius = wire.getSoundRadius();

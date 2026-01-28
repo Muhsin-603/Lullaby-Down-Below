@@ -91,8 +91,7 @@ public class Player {
         // 2. Check Properties
         if (food.getType() == Food.FoodType.ENERGY_SEED) {
             // Apply 5 seconds of speed (60 fps * 5)
-            this.speedBoostTimer = 300; 
-            System.out.println("PLAYER: ENERGY RUSH!");
+            this.speedBoostTimer = 300;
         }
     }
     // Add this method anywhere inside your Player class
@@ -136,12 +135,7 @@ public class Player {
                 this.hunger = 0;
             }
 
-            soundManager.playSound("dash"); // Play dash sound
-            System.out.println("Dashed! Hunger remaining: " + this.hunger);
-        } else if (dashCooldown > 0) {
-            System.out.println("Dash on cooldown!");
-        } else if (hunger < DASH_HUNGER_COST) {
-            System.out.println("Not enough hunger to dash! Need: " + DASH_HUNGER_COST + " | Have: " + this.hunger);
+            soundManager.playSound("dash");
         }
     }
 
@@ -351,8 +345,6 @@ public class Player {
                         SPRITE_HEIGHT));
             }
 
-            System.out.println("Loaded " + walkDownFrames.size() + " walk down frames."); // Keep confirmation prints
-
         } catch (Exception e) {
             System.err.println("CRASH! Could not load sprites or slice player sheet!");
             e.printStackTrace();
@@ -362,13 +354,10 @@ public class Player {
     // Add this method to Player.java
     public void struggle() {
         if (currentState == PlayerState.WEBBED) {
-            webStrength--; // Chip away at the web's strength
-            System.out.println("Struggling! Taps left: " + webStrength);
+            webStrength--;
 
             if (webStrength <= 0) {
-                // The lock is broken!
-                System.out.println("PLAYER: I'M FREE!");
-                currentState = PlayerState.IDLE_DOWN; // FREEDOM!
+                currentState = PlayerState.IDLE_DOWN;
                 webbedTimer = 300;
                 webStrength = WEB_ESCAPE_REQUIRED;
             }
@@ -390,18 +379,16 @@ public class Player {
         if (isCrying) {
             cryDeathTimer--;
             if (cryDeathTimer <= 0) {
-                System.out.println("PLAYER: Died from hunger/crying.");
                 this.hunger = 0;
             }
         } else {
             hungerDrainTimer++;
-            if (hungerDrainTimer > 120) { // Drain 1 hunger every 2 seconds
+            if (hungerDrainTimer > 120) {
                 this.hunger--;
                 hungerDrainTimer = 0;
                 if (this.hunger <= 0) {
                     this.hunger = 0;
                     if (!isCrying) {
-                        System.out.println("PLAYER: WAAAAAAH! Hunger is zero!");
                         this.isCrying = true;
                         this.cryDeathTimer = CRY_DEATH_DURATION;
                     }
@@ -470,20 +457,14 @@ public class Player {
         }
 
         if (currentState == PlayerState.WEBBED) {
-            // --- Webbed Logic (Check for instant death first) ---
-            if (isCrying) { // If caught while already crying
-                System.out.println("PLAYER: Caught while crying! Instant death.");
-                this.hunger = 0; // Set hunger to 0 (or health if you reintroduced it)
-                // No need to return here, let GamePanel handle the Game Over state next frame
+            if (isCrying) {
+                this.hunger = 0;
             } else {
-                // Normal webbed countdown
                 webbedTimer--;
                 if (webbedTimer <= 0) {
-                    System.out.println("PLAYER: Died from webbed state");
                     this.diedFromWeb = true;
-                    /// currentState = PlayerState.IDLE_DOWN;
                 }
-                return; // Still can't move while webbed (unless instantly dead)
+                return;
             }
         }
         updateHungerAndCrying(soundManager);

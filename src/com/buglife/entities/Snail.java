@@ -90,7 +90,6 @@ public class Snail {
                 int frameX = IDLE_START_X + i * IDLE_H_STEP;
                 idleFrames.add(spriteSheet.getSubimage(frameX, IDLE_START_Y, IDLE_WIDTH, IDLE_HEIGHT));
             }
-            System.out.println("Snail Idle Animation Loaded!");
 
         } catch (Exception e) {
             System.err.println("CRASH! Could not slice snail idle frames. Check measurements!");
@@ -141,7 +140,6 @@ public class Snail {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
-        System.out.println("Snail position set to: " + x + ", " + y);
     }
 
     public boolean isVisible() {
@@ -154,7 +152,6 @@ public class Snail {
 
     public void show() {
         this.isVisible = true;
-        System.out.println("Snail is now visible at: " + x + ", " + y);
     }
 
     // Helper methods

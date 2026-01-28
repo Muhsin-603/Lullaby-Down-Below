@@ -28,29 +28,25 @@ public class SoundManager {
     }
 
     public void loadSound(String name, String path) {
-        try {
-            InputStream audioSrc = getClass().getResourceAsStream(path);
-            if (audioSrc == null) {
+        try (InputStream audioSrc = getClass().getResourceAsStream(path);
+             InputStream bufferedIn = audioSrc != null ? new BufferedInputStream(audioSrc) : null) {
+            
+            if (bufferedIn == null) {
                 System.err.println("Sound file not found: " + path);
                 return;
             }
-            // Use BufferedInputStream for better performance, especially with larger files
-            InputStream bufferedIn = new BufferedInputStream(audioSrc);
+
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(bufferedIn);
             Clip clip = AudioSystem.getClip();
             clip.open(audioStream);
             soundClips.put(name, clip);
-            System.out.println("Loaded sound: " + name);
-
+            
         } catch (UnsupportedAudioFileException e) {
             System.err.println("Error: Audio file format not supported: " + path + " - Use WAV format.");
-            e.printStackTrace();
         } catch (LineUnavailableException e) {
-            System.err.println("Error: Audio line unavailable.");
-            e.printStackTrace();
-        } catch (Exception e) { // Catch general IO exceptions too
+            System.err.println("Error: Audio line unavailable for: " + path);
+        } catch (Exception e) {
             System.err.println("Error loading sound: " + path);
-            e.printStackTrace();
         }
     }
 

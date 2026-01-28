@@ -130,14 +130,12 @@ public class Toy {
         this.isCarried = true;
         this.active = false;
         this.makingNoise = false;
-        System.out.println("Picked up the toy!");
     }
 
     public void drop(Player player) {
         this.isCarried = false;
         this.x = player.getCenterX();
         this.y = player.getCenterY();
-        System.out.println("Dropped the toy!");
     }
 
     public boolean isCarried() {
