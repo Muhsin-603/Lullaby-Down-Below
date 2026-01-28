@@ -2,17 +2,14 @@ package com.buglife.entities;
 
 import com.buglife.world.World;
 import com.buglife.assets.AssetManager;
-import javax.imageio.ImageIO;
+// import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import java.util.List;
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Snail {
-    private static final Logger logger = LoggerFactory.getLogger(Snail.class);
 
     private double x, y;
     private int width = 35; // Use the Idle dimensions

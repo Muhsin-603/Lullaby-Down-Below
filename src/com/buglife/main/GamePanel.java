@@ -2,8 +2,6 @@ package com.buglife.main;
 
 import com.buglife.assets.SoundManager;
 import com.buglife.utils.PerformanceMonitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import javax.swing.JPanel;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -14,7 +12,6 @@ import java.awt.Color;
  
 
 public class GamePanel extends JPanel {
-    private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
     public static final int VIRTUAL_WIDTH = 1366;
     public static final int VIRTUAL_HEIGHT = 768;
 

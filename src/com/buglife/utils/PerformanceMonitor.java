@@ -11,7 +11,7 @@ public class PerformanceMonitor {
     private static final Logger logger = LoggerFactory.getLogger(PerformanceMonitor.class);
     private static PerformanceMonitor instance;
     
-    private long lastFrameTime;
+    // private long lastFrameTime;
     private long frameCount;
     private double currentFPS;
     private double averageFPS;
@@ -35,7 +35,7 @@ public class PerformanceMonitor {
     
     private PerformanceMonitor() {
         this.startTime = System.nanoTime();
-        this.lastFrameTime = System.nanoTime();
+        // this.lastFrameTime = System.nanoTime();
         this.fpsUpdateTime = System.currentTimeMillis();
         this.lastMemoryCheck = System.currentTimeMillis();
         this.showDebugOverlay = false;
@@ -86,7 +86,7 @@ public class PerformanceMonitor {
                     maxMemory / 1_048_576);
         }
         
-        lastFrameTime = currentTime;
+        // lastFrameTime = currentTime;
     }
     
     /**

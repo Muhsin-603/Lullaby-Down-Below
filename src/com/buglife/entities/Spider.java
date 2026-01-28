@@ -1,6 +1,6 @@
 package com.buglife.entities;
 
-import javax.imageio.ImageIO;
+// import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;

@@ -5,11 +5,8 @@ import java.awt.event.KeyEvent;
 import com.buglife.assets.SoundManager;
 import com.buglife.main.GameStateManager;
 import com.buglife.ui.MainMenu;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MenuState extends GameState {
-    private static final Logger logger = LoggerFactory.getLogger(MenuState.class);
     private MainMenu mainMenu;
     private SoundManager soundManager;
 

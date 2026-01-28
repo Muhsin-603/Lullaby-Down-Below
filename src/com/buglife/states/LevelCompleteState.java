@@ -7,11 +7,8 @@ import java.awt.event.KeyEvent;
 import com.buglife.main.GamePanel;
 import com.buglife.main.GameStateManager;
 import com.buglife.assets.SoundManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class LevelCompleteState extends GameState {
-    private static final Logger logger = LoggerFactory.getLogger(LevelCompleteState.class);
     private SoundManager soundManager;
     private static final Font BIG_FONT = new Font("Consolas", Font.BOLD, 80);
     private static final Font SMALL_FONT = new Font("Consolas", Font.PLAIN, 24);
