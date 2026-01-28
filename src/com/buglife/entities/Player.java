@@ -67,6 +67,34 @@ public class Player {
     public boolean hasDiedFromWeb() {
         return this.diedFromWeb;
     }
+    
+    /**
+     * Get current state as string for debug display
+     */
+    public String getCurrentState() {
+        if (isDashing) return "DASHING";
+        if (speedBoostTimer > 0) return "SPEED_BOOST";
+        if (currentState == PlayerState.WEBBED) return "WEBBED";
+        if (isCrying()) return "CRYING";
+        return currentState.name();
+    }
+    
+    /**
+     * Get current movement speed
+     */
+    public double getSpeed() {
+        if (isDashing) return GameConstants.Player.DASH_SPEED;
+        if (speedBoostTimer > 0) return GameConstants.Player.BOOST_SPEED;
+        return GameConstants.Player.NORMAL_SPEED;
+    }
+    
+    /**
+     * Check if player is holding the toy (for debug display)
+     * Note: Toy carrying is tracked in Toy class, this is a placeholder
+     */
+    public boolean isHoldingToy() {
+        return false; // Toy tracks its own carried state
+    }
 
     public enum PlayerState {
         IDLE_DOWN, // Standing, facing down

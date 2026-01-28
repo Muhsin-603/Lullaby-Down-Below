@@ -2,14 +2,23 @@ package com.buglife.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.io.InputStream;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Performance monitoring utility for tracking FPS, memory usage, and game metrics.
  * Provides debug information overlay and performance logging.
+ * Extended with comprehensive debug features: spider controls, visualization, timing, entity tracking.
  */
 public class PerformanceMonitor {
     private static final Logger logger = LoggerFactory.getLogger(PerformanceMonitor.class);
     private static PerformanceMonitor instance;
+    private static final String DEBUG_CONFIG_PATH = "src/main/resources/debug-settings.json";
     
     // private long lastFrameTime;
     private long frameCount;
@@ -33,12 +42,54 @@ public class PerformanceMonitor {
     private long lastMemoryCheck;
     private boolean showDebugOverlay;
     
+    // Spider debug controls
+    private boolean spiderPatrolEnabled;
+    private boolean spiderDetectionEnabled;
+    private boolean showSpiderToggles;
+    
+    // Player coordinates
+    private int playerX;
+    private int playerY;
+    
+    // Visualization toggles
+    private boolean showHitboxes;
+    private boolean showTileGrid;
+    private boolean showSpiderPaths;
+    private boolean godMode;
+    
+    // Timing tracking
+    private double updateTimeMs;
+    private double renderTimeMs;
+    private double[] frameTimes;
+    private int frameTimeIndex;
+    
+    // Entity counts
+    private int spiderCount;
+    private int snailCount;
+    private int foodCount;
+    
+    // Player state
+    private String playerState;
+    private int playerHunger;
+    private double playerSpeed;
+    private boolean playerWebbed;
+    private boolean playerHasToy;
+    
+    // Level info
+    private String currentLevel;
+    
     private PerformanceMonitor() {
         this.startTime = System.nanoTime();
         // this.lastFrameTime = System.nanoTime();
         this.fpsUpdateTime = System.currentTimeMillis();
         this.lastMemoryCheck = System.currentTimeMillis();
-        this.showDebugOverlay = false;
+        
+        // Initialize frame times array
+        this.frameTimes = new double[60];
+        this.frameTimeIndex = 0;
+        
+        // Load debug settings from JSON
+        loadDebugConfig();
     }
     
     public static PerformanceMonitor getInstance() {
@@ -87,6 +138,40 @@ public class PerformanceMonitor {
         }
         
         // lastFrameTime = currentTime;
+    }
+    
+    /**
+     * Set timing information for current frame
+     */
+    public void setFrameTiming(double updateMs, double renderMs) {
+        this.updateTimeMs = updateMs;
+        this.renderTimeMs = renderMs;
+        
+        // Store frame time for graph
+        double totalFrameTime = updateMs + renderMs;
+        frameTimes[frameTimeIndex] = totalFrameTime;
+        frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length;
+    }
+    
+    /**
+     * Get frame times for graph rendering
+     */
+    public double[] getFrameTimes() {
+        return frameTimes;
+    }
+    
+    /**
+     * Get update time in milliseconds
+     */
+    public double getUpdateTimeMs() {
+        return updateTimeMs;
+    }
+    
+    /**
+     * Get render time in milliseconds
+     */
+    public double getRenderTimeMs() {
+        return renderTimeMs;
     }
     
     /**
@@ -162,12 +247,333 @@ public class PerformanceMonitor {
         return (double) usedMemory / maxMemory * 100.0;
     }
     
+    // ========== SPIDER DEBUG CONTROLS ==========
+    
+    /**
+     * Toggle spider debug menu visibility
+     */
+    public void toggleSpiderTogglesMenu() {
+        showSpiderToggles = !showSpiderToggles;
+        logger.info("Spider debug menu: {}", showSpiderToggles ? "ON" : "OFF");
+        saveDebugConfig();
+    }
+    
+    /**
+     * Toggle spider patrol movement
+     */
+    public void toggleSpiderPatrol() {
+        spiderPatrolEnabled = !spiderPatrolEnabled;
+        logger.info("Spider patrol: {}", spiderPatrolEnabled ? "ENABLED" : "DISABLED");
+        saveDebugConfig();
+    }
+    
+    /**
+     * Toggle spider detection/chasing
+     */
+    public void toggleSpiderDetection() {
+        spiderDetectionEnabled = !spiderDetectionEnabled;
+        logger.info("Spider detection: {}", spiderDetectionEnabled ? "ENABLED" : "DISABLED");
+        saveDebugConfig();
+    }
+    
+    /**
+     * Check if spider patrol is enabled
+     */
+    public boolean isSpiderPatrolEnabled() {
+        return spiderPatrolEnabled;
+    }
+    
+    /**
+     * Check if spider detection is enabled
+     */
+    public boolean isSpiderDetectionEnabled() {
+        return spiderDetectionEnabled;
+    }
+    
+    /**
+     * Check if spider toggles menu should be shown
+     */
+    public boolean isSpiderTogglesVisible() {
+        return showSpiderToggles;
+    }
+    
+    // ========== PLAYER COORDINATES ==========
+    
+    /**
+     * Set player coordinates
+     */
+    public void setPlayerCoordinates(int x, int y) {
+        this.playerX = x;
+        this.playerY = y;
+    }
+    
+    /**
+     * Get player X coordinate
+     */
+    public int getPlayerX() {
+        return playerX;
+    }
+    
+    /**
+     * Get player Y coordinate
+     */
+    public int getPlayerY() {
+        return playerY;
+    }
+    
+    // ========== VISUALIZATION TOGGLES ==========
+    
+    /**
+     * Toggle hitbox visualization
+     */
+    public void toggleHitboxes() {
+        showHitboxes = !showHitboxes;
+        logger.info("Hitbox visualization: {}", showHitboxes ? "ON" : "OFF");
+        saveDebugConfig();
+    }
+    
+    /**
+     * Toggle tile grid overlay
+     */
+    public void toggleTileGrid() {
+        showTileGrid = !showTileGrid;
+        logger.info("Tile grid: {}", showTileGrid ? "ON" : "OFF");
+        saveDebugConfig();
+    }
+    
+    /**
+     * Toggle spider path visualization
+     */
+    public void toggleSpiderPaths() {
+        showSpiderPaths = !showSpiderPaths;
+        logger.info("Spider paths: {}", showSpiderPaths ? "ON" : "OFF");
+        saveDebugConfig();
+    }
+    
+    /**
+     * Toggle god mode
+     */
+    public void toggleGodMode() {
+        godMode = !godMode;
+        logger.info("God mode: {}", godMode ? "ON" : "OFF");
+        saveDebugConfig();
+    }
+    
+    /**
+     * Check if hitboxes should be shown
+     */
+    public boolean isShowHitboxes() {
+        return showHitboxes;
+    }
+    
+    /**
+     * Check if tile grid should be shown
+     */
+    public boolean isShowTileGrid() {
+        return showTileGrid;
+    }
+    
+    /**
+     * Check if spider paths should be shown
+     */
+    public boolean isShowSpiderPaths() {
+        return showSpiderPaths;
+    }
+    
+    /**
+     * Check if god mode is enabled
+     */
+    public boolean isGodModeEnabled() {
+        return godMode;
+    }
+    
+    // ========== ENTITY TRACKING ==========
+    
+    /**
+     * Set entity counts
+     */
+    public void setEntityCounts(int spiders, int snails, int foods) {
+        this.spiderCount = spiders;
+        this.snailCount = snails;
+        this.foodCount = foods;
+    }
+    
+    /**
+     * Get spider count
+     */
+    public int getSpiderCount() {
+        return spiderCount;
+    }
+    
+    /**
+     * Get snail count
+     */
+    public int getSnailCount() {
+        return snailCount;
+    }
+    
+    /**
+     * Get food count
+     */
+    public int getFoodCount() {
+        return foodCount;
+    }
+    
+    // ========== PLAYER STATE ==========
+    
+    /**
+     * Set player state information
+     */
+    public void setPlayerState(String state, int hunger, double speed, boolean webbed, boolean hasToy) {
+        this.playerState = state;
+        this.playerHunger = hunger;
+        this.playerSpeed = speed;
+        this.playerWebbed = webbed;
+        this.playerHasToy = hasToy;
+    }
+    
+    /**
+     * Get player state string
+     */
+    public String getPlayerState() {
+        return playerState != null ? playerState : "UNKNOWN";
+    }
+    
+    /**
+     * Get player hunger
+     */
+    public int getPlayerHunger() {
+        return playerHunger;
+    }
+    
+    /**
+     * Get player speed
+     */
+    public double getPlayerSpeed() {
+        return playerSpeed;
+    }
+    
+    /**
+     * Is player webbed
+     */
+    public boolean isPlayerWebbed() {
+        return playerWebbed;
+    }
+    
+    /**
+     * Does player have toy
+     */
+    public boolean isPlayerHasToy() {
+        return playerHasToy;
+    }
+    
+    // ========== LEVEL INFO ==========
+    
+    /**
+     * Set current level name
+     */
+    public void setCurrentLevel(String level) {
+        this.currentLevel = level;
+    }
+    
+    /**
+     * Get current level name
+     */
+    public String getCurrentLevel() {
+        return currentLevel != null ? currentLevel : "Unknown";
+    }
+    
+    // ========== CONFIG PERSISTENCE ==========
+    
+    /**
+     * Load debug configuration from JSON file
+     */
+    private void loadDebugConfig() {
+        try {
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("debug-settings.json");
+            if (inputStream != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(inputStream);
+                
+                spiderPatrolEnabled = root.path("spiderPatrolEnabled").asBoolean(true);
+                spiderDetectionEnabled = root.path("spiderDetectionEnabled").asBoolean(true);
+                showHitboxes = root.path("showHitboxes").asBoolean(false);
+                showTileGrid = root.path("showTileGrid").asBoolean(false);
+                showSpiderPaths = root.path("showSpiderPaths").asBoolean(false);
+                godMode = root.path("godMode").asBoolean(false);
+                showDebugOverlay = root.path("showDebugOverlay").asBoolean(false);
+                
+                logger.info("Debug configuration loaded successfully");
+            } else {
+                // Use defaults if file not found
+                setDefaultDebugSettings();
+                logger.warn("debug-settings.json not found, using defaults");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load debug configuration, using defaults", e);
+            setDefaultDebugSettings();
+        }
+    }
+    
+    /**
+     * Save debug configuration to JSON file
+     */
+    private void saveDebugConfig() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            
+            // Create JSON structure
+            String json = String.format(
+                "{\n" +
+                "  \"spiderPatrolEnabled\": %s,\n" +
+                "  \"spiderDetectionEnabled\": %s,\n" +
+                "  \"showHitboxes\": %s,\n" +
+                "  \"showTileGrid\": %s,\n" +
+                "  \"showSpiderPaths\": %s,\n" +
+                "  \"godMode\": %s,\n" +
+                "  \"showDebugOverlay\": %s\n" +
+                "}",
+                spiderPatrolEnabled,
+                spiderDetectionEnabled,
+                showHitboxes,
+                showTileGrid,
+                showSpiderPaths,
+                godMode,
+                showDebugOverlay
+            );
+            
+            // Write to file
+            try (FileWriter writer = new FileWriter(DEBUG_CONFIG_PATH)) {
+                writer.write(json);
+            }
+            
+            logger.debug("Debug configuration saved");
+        } catch (Exception e) {
+            logger.error("Failed to save debug configuration", e);
+        }
+    }
+    
+    /**
+     * Set default debug settings
+     */
+    private void setDefaultDebugSettings() {
+        spiderPatrolEnabled = true;
+        spiderDetectionEnabled = true;
+        showHitboxes = false;
+        showTileGrid = false;
+        showSpiderPaths = false;
+        godMode = false;
+        showDebugOverlay = false;
+        showSpiderToggles = false;
+    }
+    
     /**
      * Toggle debug overlay
      */
     public void toggleDebugOverlay() {
         showDebugOverlay = !showDebugOverlay;
         logger.info("Debug overlay: {}", showDebugOverlay ? "ON" : "OFF");
+        saveDebugConfig();
     }
     
     /**

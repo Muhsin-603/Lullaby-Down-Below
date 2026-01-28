@@ -1,5 +1,6 @@
 package com.buglife.states;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -13,6 +14,8 @@ import com.buglife.assets.SoundManager;
 import com.buglife.entities.Food;
 import com.buglife.entities.Player;
 import com.buglife.entities.Snail;
+import com.buglife.utils.PerformanceMonitor;
+import com.buglife.utils.DebugExporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.buglife.entities.Spider;
@@ -195,6 +198,26 @@ public class PlayingState extends GameState {
         if (isPaused) {
             return;
         }
+        
+        // Update PerformanceMonitor with current state info
+        PerformanceMonitor monitor = PerformanceMonitor.getInstance();
+        if (player != null) {
+            monitor.setPlayerCoordinates(player.getCenterX(), player.getCenterY());
+            boolean hasToy = toy != null && toy.isCarried();
+            monitor.setPlayerState(
+                player.getCurrentState(),
+                player.getHunger(),
+                player.getSpeed(),
+                player.isWebbed(),
+                hasToy
+            );
+        }
+        monitor.setCurrentLevel(currentLevel);
+        monitor.setEntityCounts(
+            spiders != null ? spiders.size() : 0,
+            snail != null ? snail.getLocationsCount() : 0,
+            foods != null ? foods.size() : 0
+        );
 
         if (snail != null && snail.getLocationsCount() > 1) {
             snail.update(world);
@@ -272,6 +295,11 @@ public class PlayingState extends GameState {
                 double requiredDistance = player.getRadius() + currentSpider.getRadius();
 
                 if (distance < requiredDistance) {
+                    // Skip all damage if god mode is enabled
+                    if (PerformanceMonitor.getInstance().isGodModeEnabled()) {
+                        continue;
+                    }
+                    
                     if (player.getHunger() <= 0) {
                         logger.info("Game Over: Player caught with zero hunger");
                         soundManager.stopSound("music");
@@ -336,14 +364,31 @@ public class PlayingState extends GameState {
 
     @Override
     public void draw(Graphics2D g) {
+        PerformanceMonitor monitor = PerformanceMonitor.getInstance();
+        
         world.render(g, cameraX, cameraY, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 
         Graphics2D entityG2d = (Graphics2D) g.create();
         try {
             entityG2d.translate(-cameraX, -cameraY);
+            
+            // Draw tile grid overlay if enabled
+            if (monitor.isShowTileGrid()) {
+                drawTileGrid(entityG2d);
+            }
 
             if (player != null) {
                 player.render(entityG2d, world);
+                
+                // Draw player hitbox if enabled
+                if (monitor.isShowHitboxes()) {
+                    entityG2d.setColor(Color.GREEN);
+                    entityG2d.setStroke(new BasicStroke(2));
+                    // Player size is 32x32
+                    int playerSize = 32;
+                    entityG2d.drawRect(player.getCenterX() - playerSize/2, player.getCenterY() - playerSize/2, 
+                        playerSize, playerSize);
+                }
             }
 
             if (toy != null) {
@@ -351,10 +396,27 @@ public class PlayingState extends GameState {
                 if (!toy.isCarried() && toy.canPickUp(player)) {
                     toy.drawInteractionPrompt(entityG2d);
                 }
+                
+                // Draw toy hitbox if enabled
+                if (monitor.isShowHitboxes() && !toy.isCarried()) {
+                    entityG2d.setColor(Color.CYAN);
+                    entityG2d.setStroke(new BasicStroke(2));
+                    // Toy size is 24x24
+                    int toySize = 24;
+                    entityG2d.drawRect(toy.getCenterX() - toySize/2, toy.getCenterY() - toySize/2, 
+                        toySize, toySize);
+                }
             }
 
             for (TripWire wire : tripWires) {
                 wire.draw(entityG2d);
+                
+                // Draw tripwire hitbox if enabled
+                if (monitor.isShowHitboxes()) {
+                    entityG2d.setColor(Color.MAGENTA);
+                    entityG2d.setStroke(new BasicStroke(2));
+                    entityG2d.drawRect(wire.getX(), wire.getY(), 32, 32);
+                }
             }
 
             if (snail != null && snail.isVisible()) {
@@ -364,12 +426,33 @@ public class PlayingState extends GameState {
             for (Spider spider : spiders) {
                 if (spider != null) {
                     spider.draw(entityG2d);
+                    
+                    // Draw spider hitbox if enabled
+                    if (monitor.isShowHitboxes()) {
+                        entityG2d.setColor(Color.RED);
+                        entityG2d.setStroke(new BasicStroke(2));
+                        // Spider size is ~50x50
+                        int spiderSize = 50;
+                        entityG2d.drawRect(spider.getCenterX() - spiderSize/2, spider.getCenterY() - spiderSize/2, 
+                            spiderSize, spiderSize);
+                    }
                 }
             }
 
             for (Food currFood : foods) {
                 if (currFood != null) {
                     currFood.draw(entityG2d);
+                    
+                    // Draw food hitbox if enabled
+                    if (monitor.isShowHitboxes()) {
+                        entityG2d.setColor(Color.YELLOW);
+                        entityG2d.setStroke(new BasicStroke(1));
+                        // Food uses radius-based circular hitbox
+                        double radius = currFood.getRadius();
+                        int size = (int)(radius * 2);
+                        entityG2d.drawOval(currFood.getCenterX() - (int)radius, currFood.getCenterY() - (int)radius, 
+                            size, size);
+                    }
                 }
             }
         } finally {
@@ -416,13 +499,7 @@ public class PlayingState extends GameState {
             g.drawString("SPEED BOOST", 220, 44);
         }
 
-        if (player != null) {
-            g.setFont(HUD_FONT);
-            g.setColor(Color.WHITE);
-            String coords = "X: " + player.getCenterX() + " | Y: " + player.getCenterY();
-            int coordsWidth = g.getFontMetrics().stringWidth(coords);
-            g.drawString(coords, VIRTUAL_WIDTH - coordsWidth - 15, 25);
-        }
+        // Coordinates now shown in F3 debug overlay instead of here
 
         if (player != null && player.isWebbed()) {
             g.setColor(Color.WHITE);
@@ -430,6 +507,43 @@ public class PlayingState extends GameState {
             String struggleMsg = "PRESS [SPACE] TO STRUGGLE!";
             int msgWidth = g.getFontMetrics().stringWidth(struggleMsg);
             g.drawString(struggleMsg, (VIRTUAL_WIDTH - msgWidth) / 2, VIRTUAL_HEIGHT - 100);
+        }
+    }
+    
+    /**
+     * Draw tile grid overlay for debugging
+     */
+    private void drawTileGrid(Graphics2D g) {
+        int tileSize = World.TILE_SIZE;
+        int startCol = Math.max(0, cameraX / tileSize);
+        int startRow = Math.max(0, cameraY / tileSize);
+        int endCol = Math.min(world.getMapWidth(), (cameraX + VIRTUAL_WIDTH) / tileSize + 1);
+        int endRow = Math.min(world.getMapHeight(), (cameraY + VIRTUAL_HEIGHT) / tileSize + 1);
+        
+        g.setFont(new Font("Monospaced", Font.PLAIN, 8));
+        g.setStroke(new BasicStroke(1));
+        
+        for (int row = startRow; row < endRow; row++) {
+            for (int col = startCol; col < endCol; col++) {
+                int x = col * tileSize;
+                int y = row * tileSize;
+                
+                // Draw grid lines
+                boolean isSolid = world.isTileSolid(x, y);
+                if (isSolid) {
+                    g.setColor(new Color(255, 0, 0, 50)); // Red tint for solid tiles
+                    g.fillRect(x, y, tileSize, tileSize);
+                }
+                
+                g.setColor(new Color(100, 100, 100, 100)); // Gray grid lines
+                g.drawRect(x, y, tileSize, tileSize);
+                
+                // Draw tile coordinates (every other tile to avoid clutter)
+                if (row % 2 == 0 && col % 2 == 0) {
+                    g.setColor(new Color(255, 255, 255, 150));
+                    g.drawString(col + "," + row, x + 2, y + 10);
+                }
+            }
         }
     }
 
@@ -517,6 +631,22 @@ public class PlayingState extends GameState {
                 toy.throwToy(player.getCenterX(), player.getCenterY(), player.getFacingDirection());
                 soundManager.playSound("throw");
             }
+        }
+        
+        // F12: Export game state for debugging
+        if (keyCode == KeyEvent.VK_F12) {
+            PerformanceMonitor monitor = PerformanceMonitor.getInstance();
+            DebugExporter.exportGameState(
+                currentLevel,
+                player.getCenterX(),
+                player.getCenterY(),
+                player.getHunger(),
+                player.getCurrentState(),
+                spiders.size(),
+                snail != null ? snail.getLocationsCount() : 0,
+                foods.size()
+            );
+            logger.info("Game state exported via F12");
         }
     }
 

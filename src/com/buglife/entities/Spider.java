@@ -4,6 +4,7 @@ package com.buglife.entities;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.BasicStroke;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import com.buglife.assets.SoundManager;
 import com.buglife.assets.AssetManager;
+import com.buglife.utils.PerformanceMonitor;
 //import com.buglife.entities.Player.PlayerState;
 import com.buglife.world.World;
 import java.awt.Point;
@@ -92,6 +94,11 @@ public class Spider {
     private boolean canSeePlayer(Player player, World world) {
         if (player == null)
             return false;
+        
+        // Check if spider detection is disabled in debug
+        if (!PerformanceMonitor.getInstance().isSpiderDetectionEnabled()) {
+            return false;
+        }
 
         // 1. Simple distance check first (is the player even close enough?)
         double dx = player.getCenterX() - getCenterX();
@@ -383,6 +390,46 @@ public class Spider {
     }
 
     public void draw(Graphics g) {
+        PerformanceMonitor monitor = PerformanceMonitor.getInstance();
+        
+        // Draw patrol path if enabled
+        if (monitor.isShowSpiderPaths() && patrolPath != null && patrolPath.size() >= 2) {
+            Graphics2D g2d = (Graphics2D) g.create();
+            try {
+                // Draw path lines
+                g2d.setColor(new Color(255, 255, 255, 100)); // Semi-transparent white
+                g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                    0, new float[]{5, 5}, 0)); // Dashed line
+                
+                for (int i = 0; i < patrolPath.size() - 1; i++) {
+                    Point p1 = patrolPath.get(i);
+                    Point p2 = patrolPath.get(i + 1);
+                    g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
+                }
+                
+                // Draw waypoint circles with numbers
+                g2d.setStroke(new BasicStroke(2));
+                for (int i = 0; i < patrolPath.size(); i++) {
+                    Point p = patrolPath.get(i);
+                    
+                    // Highlight current target
+                    if (i == currentTargetIndex) {
+                        g2d.setColor(Color.YELLOW);
+                        g2d.fillOval(p.x - 8, p.y - 8, 16, 16);
+                    } else {
+                        g2d.setColor(new Color(200, 200, 200, 150));
+                        g2d.fillOval(p.x - 6, p.y - 6, 12, 12);
+                    }
+                    
+                    // Draw waypoint number
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawString(String.valueOf(i), p.x - 3, p.y + 4);
+                }
+            } finally {
+                g2d.dispose();
+            }
+        }
+        
         // We will use the simple draw method for now to be safe
         BufferedImage imageToDraw = walkingFrames[currentFrame];
         if (imageToDraw != null) {
@@ -397,6 +444,36 @@ public class Spider {
             // Failsafe so we can see it even if sprites are null
             g.setColor(Color.MAGENTA);
             g.fillRect((int) this.x, (int) this.y, this.width, this.height);
+        }
+        
+        // Draw debug overlays for frozen patrol (red) and disabled detection (blue)
+        boolean patrolFrozen = !monitor.isSpiderPatrolEnabled();
+        boolean detectionDisabled = !monitor.isSpiderDetectionEnabled();
+        
+        if (patrolFrozen || detectionDisabled) {
+            Graphics2D g2d = (Graphics2D) g.create();
+            try {
+                int centerX = getCenterX();
+                int centerY = getCenterY();
+                int radius = (width + height) / 2; // Average of width and height
+                
+                // Red circle for patrol frozen
+                if (patrolFrozen) {
+                    g2d.setColor(Color.RED);
+                    g2d.setStroke(new BasicStroke(4));
+                    g2d.drawOval(centerX - radius, centerY - radius, radius * 2, radius * 2);
+                }
+                
+                // Blue circle (slightly larger) for detection disabled
+                if (detectionDisabled) {
+                    g2d.setColor(Color.BLUE);
+                    g2d.setStroke(new BasicStroke(4));
+                    int blueRadius = radius + 6;
+                    g2d.drawOval(centerX - blueRadius, centerY - blueRadius, blueRadius * 2, blueRadius * 2);
+                }
+            } finally {
+                g2d.dispose();
+            }
         }
     }
 
@@ -436,6 +513,11 @@ public class Spider {
     }
 
     private void doPatrol(World world) {
+        // Check if spider patrol is disabled in debug
+        if (!PerformanceMonitor.getInstance().isSpiderPatrolEnabled()) {
+            return; // Patrol frozen - spider stays in place
+        }
+        
         if (patrolPath == null || patrolPath.isEmpty() || patrolPath.size() < 2) {
             return; // Can't patrol without at least two points.
         }
