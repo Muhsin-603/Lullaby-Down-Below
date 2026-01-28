@@ -90,7 +90,7 @@ If you don't have Java installed:
 2. Download the source code
 3. Run:
    ```bash
-   java -jar target/lullaby-down-below-1.0.0-jar-with-dependencies.jar
+   java -jar target/lullaby-down-below-1.5.0-jar-with-dependencies.jar
    ```
 
 ### Controls
