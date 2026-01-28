@@ -79,12 +79,15 @@ public class World {
     }
 
     public World() {
-        
+        this("level1"); // Default to level 1
+    }
+    
+    public World(String levelName) {
         if(tileTypes == null){
             loadTileTypes();
         }
         
-        loadMapFromFile("/res/maps/level1.txt");
+        loadMapFromFile("/res/maps/" + levelName + ".txt");
     }
 
     private void loadMapFromFile(String filePath) {

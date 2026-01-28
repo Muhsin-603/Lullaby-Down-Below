@@ -10,6 +10,10 @@ import java.util.Map;
 public class SoundManager {
 
     private Map<String, Clip> soundClips; // Stores loaded sound effects
+    private float masterVolume = 0.8f; // 0.0 to 1.0
+    private float musicVolume = 0.8f;
+    private float sfxVolume = 1.0f;
+    private final String[] musicTracks = {"music", "menuMusic", "chasing"};
 
     public SoundManager() {
         soundClips = new HashMap<>();
@@ -92,5 +96,110 @@ public class SoundManager {
                 clip.stop();
             }
         }
+    }
+    
+    /**
+     * Set volume for a specific sound (0.0 to 1.0)
+     */
+    public void setVolume(String soundName, float volume) {
+        Clip clip = soundClips.get(soundName);
+        if (clip != null) {
+            setClipVolume(clip, volume * masterVolume);
+        }
+    }
+    
+    /**
+     * Set master volume affecting all sounds (0.0 to 1.0)
+     */
+    public void setMasterVolume(float volume) {
+        this.masterVolume = Math.max(0.0f, Math.min(1.0f, volume));
+        updateAllVolumes();
+    }
+    
+    /**
+     * Set music volume for background music tracks (0.0 to 1.0)
+     */
+    public void setMusicVolume(float volume) {
+        this.musicVolume = Math.max(0.0f, Math.min(1.0f, volume));
+        for (String musicName : musicTracks) {
+            Clip clip = soundClips.get(musicName);
+            if (clip != null) {
+                setClipVolume(clip, musicVolume * masterVolume);
+            }
+        }
+    }
+    
+    /**
+     * Set SFX volume for sound effects (0.0 to 1.0)
+     */
+    public void setSFXVolume(float volume) {
+        this.sfxVolume = Math.max(0.0f, Math.min(1.0f, volume));
+        for (Map.Entry<String, Clip> entry : soundClips.entrySet()) {
+            boolean isMusic = false;
+            for (String musicName : musicTracks) {
+                if (entry.getKey().equals(musicName)) {
+                    isMusic = true;
+                    break;
+                }
+            }
+            if (!isMusic) {
+                setClipVolume(entry.getValue(), sfxVolume * masterVolume);
+            }
+        }
+    }
+    
+    /**
+     * Update all volumes based on current settings
+     */
+    private void updateAllVolumes() {
+        for (Map.Entry<String, Clip> entry : soundClips.entrySet()) {
+            boolean isMusic = false;
+            for (String musicName : musicTracks) {
+                if (entry.getKey().equals(musicName)) {
+                    isMusic = true;
+                    break;
+                }
+            }
+            float volume = isMusic ? musicVolume : sfxVolume;
+            setClipVolume(entry.getValue(), volume * masterVolume);
+        }
+    }
+    
+    /**
+     * Set volume on a clip using FloatControl (converts 0-1 range to decibel range)
+     */
+    private void setClipVolume(Clip clip, float volume) {
+        if (clip == null) return;
+        
+        try {
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            float min = gainControl.getMinimum(); // typically -80.0 dB
+            float max = gainControl.getMaximum(); // typically 6.0 dB
+            
+            // Convert linear 0-1 to logarithmic decibel scale
+            float gain;
+            if (volume <= 0.0f) {
+                gain = min;
+            } else {
+                // Logarithmic mapping for natural volume perception
+                gain = min + (max - min) * (float) (Math.log10(volume * 9 + 1) / Math.log10(10));
+            }
+            
+            gainControl.setValue(gain);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Volume control not supported for this clip");
+        }
+    }
+    
+    public float getMasterVolume() {
+        return masterVolume;
+    }
+    
+    public float getMusicVolume() {
+        return musicVolume;
+    }
+    
+    public float getSFXVolume() {
+        return sfxVolume;
     }
 }
