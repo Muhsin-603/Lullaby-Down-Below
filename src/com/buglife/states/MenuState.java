@@ -58,6 +58,7 @@ public class MenuState extends GameState {
                 manager.getPlayingState().setLevel("level_test");
                 manager.setState(GameStateManager.PLAYING);
             } else if (selectedOption.equals("Settings")) {
+                manager.getSettingsState().setReturnState(GameStateManager.MENU);
                 manager.setState(GameStateManager.SETTINGS);
             } else if (selectedOption.equals("Quit")) {
                 System.exit(0);

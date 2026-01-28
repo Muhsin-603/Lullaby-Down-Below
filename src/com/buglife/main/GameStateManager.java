@@ -142,6 +142,13 @@ public class GameStateManager {
     }
 
     /**
+     * Get the SettingsState instance.
+     */
+    public SettingsState getSettingsState() {
+        return this.settingsState;
+    }
+
+    /**
      * Get the SoundManager instance.
      */
     public SoundManager getSoundManager() {

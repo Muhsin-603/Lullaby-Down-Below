@@ -23,12 +23,12 @@ import com.buglife.world.World;
 
 public class PlayingState extends GameState {
     private static final Logger logger = LoggerFactory.getLogger(PlayingState.class);
-    
+
     // Level progression
     private String currentLevel = "level1";
-    private final String[] levelOrder = {"level1", "level2", "level3", "level4", "level5"};
+    private final String[] levelOrder = { "level1", "level2", "level3", "level4", "level5" };
     private int currentLevelIndex = 0;
-    
+
     private Player player;
     private List<Spider> spiders;
     private Snail snail;
@@ -52,7 +52,7 @@ public class PlayingState extends GameState {
 
     private boolean isPaused = false;
     private int pauseMenuSelection = 0;
-    private String[] pauseOptions = { "Resume", "Restart", "Quit to Menu" };
+    private String[] pauseOptions = { "Resume", "Settings", "Restart", "Quit to Menu" };
 
     private static final Font HUD_FONT = new Font("Consolas", Font.PLAIN, 16);
     private static final Font MID_FONT = new Font("Consolas", Font.BOLD, 40);
@@ -82,9 +82,20 @@ public class PlayingState extends GameState {
         toy.setSpawnLocationPixels(574, 2256);
 
         spiders = new ArrayList<>();
-        initializeSpiders();
+        if (currentLevel.equals("level2")) {
+            initializeLevel2Spiders();
+        } else {
+            initializeSpiders(); // Default to level1 spiders
+        }
 
-        snail = new Snail(player, initializeSnailLocations());
+        // Level-specific snail initialization
+        List<Snail.SnailLocation> snailLocations;
+        if (currentLevel.equals("level2")) {
+            snailLocations = initializeLevel2SnailLocations();
+        } else {
+            snailLocations = initializeSnailLocations(); // Default to level1 snails
+        }
+        snail = new Snail(player, snailLocations);
         snailHasTeleported = true;
         nextSnailLocationIndex = 1;
         playerHasInteractedWithSnail = false;
@@ -111,7 +122,7 @@ public class PlayingState extends GameState {
         this.hasBeenInitialized = false;
         init();
     }
-    
+
     public void setLevel(String levelName) {
         this.currentLevel = levelName;
         for (int i = 0; i < levelOrder.length; i++) {
@@ -123,7 +134,7 @@ public class PlayingState extends GameState {
         this.hasBeenInitialized = false;
         init();
     }
-    
+
     public void goToNextLevel() {
         currentLevelIndex++;
         if (currentLevelIndex >= levelOrder.length) {
@@ -135,11 +146,11 @@ public class PlayingState extends GameState {
         this.hasBeenInitialized = false;
         init();
     }
-    
+
     public String getCurrentLevel() {
         return currentLevel;
     }
-    
+
     public boolean isLastLevel() {
         return currentLevelIndex >= levelOrder.length - 1;
     }
@@ -363,7 +374,7 @@ public class PlayingState extends GameState {
             // Draw border
             g.setColor(Color.BLACK);
             g.drawRect(10, 35, 200, 10);
-            
+
             // Optional Text
             g.setFont(new Font("Arial", Font.BOLD, 10));
             g.setColor(Color.WHITE);
@@ -514,6 +525,9 @@ public class PlayingState extends GameState {
             if (pauseOptions[pauseMenuSelection].equals("Resume")) {
                 isPaused = false;
                 soundManager.loopSound("music");
+            } else if (pauseOptions[pauseMenuSelection].equals("Settings")) {
+                manager.getSettingsState().setReturnState(GameStateManager.PLAYING);
+                manager.setState(GameStateManager.SETTINGS);
             } else if (pauseOptions[pauseMenuSelection].equals("Restart")) {
                 init();
             } else if (pauseOptions[pauseMenuSelection].equals("Quit to Menu")) {
@@ -567,6 +581,43 @@ public class PlayingState extends GameState {
         spiders.add(new Spider(patrolPath4));
     }
 
+    private void initializeLevel2Spiders() {
+        // Initialize spiders for level 2 - more dangerous patrols
+        List<Point> patrol1 = new ArrayList<>();
+        patrol1.add(new Point(5, 8));
+        patrol1.add(new Point(10, 8));
+        patrol1.add(new Point(10, 15));
+        patrol1.add(new Point(5, 15));
+        patrol1.add(new Point(5, 8));
+
+        List<Point> patrol2 = new ArrayList<>();
+        patrol2.add(new Point(14, 20)); // Changed from 15
+        patrol2.add(new Point(22, 20)); // Changed from 25
+        patrol2.add(new Point(22, 35)); // Changed from 25
+        patrol2.add(new Point(14, 35)); // Changed from 15
+        patrol2.add(new Point(14, 20)); // Changed from 15
+
+        List<Point> patrol3 = new ArrayList<>();
+        patrol3.add(new Point(2, 28));
+        patrol3.add(new Point(12, 28));
+        patrol3.add(new Point(12, 40));
+        patrol3.add(new Point(2, 40));
+        patrol3.add(new Point(2, 28));
+
+        List<Point> patrol4 = new ArrayList<>();
+        patrol4.add(new Point(18, 50)); // Changed from 20
+        patrol4.add(new Point(23, 50)); // Changed from 30
+        patrol4.add(new Point(23, 63)); // Changed from 30
+        patrol4.add(new Point(18, 63)); // Changed from 20
+        patrol4.add(new Point(18, 50)); // Changed from 20
+
+        spiders = new ArrayList<>();
+        spiders.add(new Spider(patrol1));
+        spiders.add(new Spider(patrol2));
+        spiders.add(new Spider(patrol3));
+        spiders.add(new Spider(patrol4));
+    }
+
     private List<Snail.SnailLocation> initializeSnailLocations() {
         List<Snail.SnailLocation> locations = new ArrayList<>();
         locations.add(new Snail.SnailLocation(
@@ -588,6 +639,27 @@ public class PlayingState extends GameState {
         return locations;
     }
 
+    private List<Snail.SnailLocation> initializeLevel2SnailLocations() {
+        List<Snail.SnailLocation> locations = new ArrayList<>();
+        locations.add(new Snail.SnailLocation(
+                new Point(184, 1856),
+                new String[] { "Welcome to the second floor...", "The spiders here are more aggressive!" },
+                true));
+        locations.add(new Snail.SnailLocation(
+                new Point(684, 1144),
+                new String[] { "I sense danger ahead...", "Stay alert and move carefully." },
+                true));
+        locations.add(new Snail.SnailLocation(
+                new Point(1304, 704),
+                new String[] { "The shadows grow deeper here.", "Use them wisely..." },
+                true));
+        locations.add(new Snail.SnailLocation(
+                new Point(1876, 280),
+                new String[] { "You're almost there...", "The next floor awaits...", "Be brave, little one!" },
+                true));
+        return locations;
+    }
+
     private void spawnFoodAtTile(int tileX, int tileY, Food.FoodType type) {
         int x = tileX * World.TILE_SIZE + (World.TILE_SIZE / 4);
         int y = tileY * World.TILE_SIZE + (World.TILE_SIZE / 4);
@@ -597,23 +669,64 @@ public class PlayingState extends GameState {
     // 2. Replace the old spawnFood() method with this "Manual Control" version
     private void spawnFood() {
         foods = new ArrayList<>();
-        
-        // --- LEVEL DESIGNER AREA ---
-        // Place your food here! 
-        // (TileX, TileY, Type)
-        
+
+        // Level-specific food spawning
+        if (currentLevel.equals("level1")) {
+            spawnFoodForLevel1();
+        } else if (currentLevel.equals("level2")) {
+            spawnFoodForLevel2();
+        } else if (currentLevel.equals("level_test")) {
+            spawnFoodForLevel1(); // Use level1 layout for test level
+        }
+
+        logger.debug("Food spawned: {} items for {}", foods.size(), currentLevel);
+    }
+
+    private void spawnFoodForLevel1() {
         // The easy snacks
         spawnFoodAtTile(16, 27, Food.FoodType.BERRY);
         spawnFoodAtTile(34, 25, Food.FoodType.BERRY);
-        
+
         // The strategic boosts (Green!)
-        spawnFoodAtTile(22, 10, Food.FoodType.ENERGY_SEED); 
-        spawnFoodAtTile(15, 15, Food.FoodType.ENERGY_SEED); 
-        
+        spawnFoodAtTile(22, 10, Food.FoodType.ENERGY_SEED);
+        spawnFoodAtTile(15, 15, Food.FoodType.ENERGY_SEED);
+
         // More berries...
         spawnFoodAtTile(5, 5, Food.FoodType.BERRY);
-        
-        logger.debug("Food spawned: {} items", foods.size());
+    }
+
+    private void spawnFoodForLevel2() {
+        // Level 2 has more food spread across multiple chambers
+        // Bottom chambers
+        spawnFoodAtTile(4, 52, Food.FoodType.BERRY);
+        spawnFoodAtTile(10, 54, Food.FoodType.BERRY);
+        spawnFoodAtTile(18, 56, Food.FoodType.ENERGY_SEED);
+
+        // Middle section
+        spawnFoodAtTile(8, 35, Food.FoodType.BERRY);
+        spawnFoodAtTile(22, 32, Food.FoodType.ENERGY_SEED);
+        spawnFoodAtTile(4, 28, Food.FoodType.BERRY);
+
+        // Upper chambers
+        spawnFoodAtTile(8, 12, Food.FoodType.BERRY);
+        spawnFoodAtTile(18, 15, Food.FoodType.ENERGY_SEED);
+        spawnFoodAtTile(28, 8, Food.FoodType.BERRY);
+
+        // Strategic high-value locations
+        spawnFoodAtTile(14, 20, Food.FoodType.ENERGY_SEED);
+    }
+
+    public boolean isInitialized() {
+        return hasBeenInitialized;
+    }
+
+    public void pauseGame() {
+        isPaused = true;
+    }
+
+    public void resumeGame() {
+        isPaused = false;
+        soundManager.loopSound("music");
     }
 
     private void handleSpiderAlerts() {
