@@ -8,6 +8,32 @@ Play as a lost **baby bug** crawling through the abandoned underground floors of
 
 ---
 
+## 🐞 Recent Updates (v1.5.x)
+
+### Advanced Debug System
+- **Performance Overlay (F3):** Toggle a detailed debug window with FPS, memory, player state, entity counts, and frame time graph.
+- **Spider Debug Controls (F2):** Open a submenu (after F3) to toggle spider patrol and detection (P/D keys). Visual indicators: red circle for frozen patrol, blue for disabled detection.
+- **Hitbox Visualization (F4):** Show collision boxes for player, spiders, food, toy, and tripwires.
+- **Tile Grid Overlay (F5):** Display tile grid and solid tiles for debugging.
+- **Spider Path Visualization (F6):** Show spider patrol paths and waypoints.
+- **God Mode (F7):** Toggle invulnerability to spider damage.
+- **Quick Actions:**
+  - **F5:** Restart level
+  - **F6:** Cycle levels
+  - **F7:** Teleport
+  - **F8:** Spawn food
+  - **F9:** God mode
+- **State Export (F12):** Export current game state to JSON for debugging.
+- **Config Persistence:** All debug settings are saved to `src/main/resources/debug-settings.json` and persist between sessions.
+
+### Other Improvements
+- **Refactored Level Configuration:** All level-specific logic moved to config classes for easier maintenance.
+- **Entity Counter:** Real-time count of spiders, food, and snail locations in debug overlay.
+- **Cleaner HUD:** Player coordinates now only shown in debug overlay, not in main HUD.
+- **Improved Spider AI:** Patrol/detection toggles affect spider behavior in real time.
+
+---
+
 ## 📖 Table of Contents
 - [Features](#-features)
 - [For Players](#-for-players)
