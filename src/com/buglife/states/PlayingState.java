@@ -18,6 +18,11 @@ import org.slf4j.LoggerFactory;
 import com.buglife.entities.Spider;
 import com.buglife.entities.Toy;
 import com.buglife.entities.TripWire;
+import com.buglife.levels.LevelConfig;
+import com.buglife.levels.LevelConfigFactory;
+import com.buglife.levels.FoodSpawnData;
+import com.buglife.levels.SnailLocationData;
+import com.buglife.levels.SpiderPatrolData;
 import com.buglife.main.GameStateManager;
 import com.buglife.world.World;
 
@@ -28,6 +33,9 @@ public class PlayingState extends GameState {
     private String currentLevel = "level1";
     private final String[] levelOrder = { "level1", "level2", "level3", "level4", "level5" };
     private int currentLevelIndex = 0;
+    
+    // Current level configuration (loaded from levels/ package)
+    private LevelConfig currentConfig;
 
     private Player player;
     private List<Spider> spiders;
@@ -72,36 +80,68 @@ public class PlayingState extends GameState {
             return;
         }
 
-        tripWires = new ArrayList<>();
-        initTripWires();
+        // Load level configuration from levels/ package
+        currentConfig = LevelConfigFactory.getConfig(currentLevel);
+        logger.info("Loading level: {} with config: {}", currentLevel, currentConfig.getClass().getSimpleName());
+
+        // Initialize world
         world = new World(currentLevel);
 
-        player = new Player(594, 2484, 32, 32);
+        // Initialize player at level-specific spawn point
+        Point playerSpawn = currentConfig.getPlayerSpawn();
+        player = new Player(playerSpawn.x, playerSpawn.y, 32, 32);
 
-        toy = new Toy();
-        toy.setSpawnLocationPixels(574, 2256);
-
-        spiders = new ArrayList<>();
-        if (currentLevel.equals("level2")) {
-            initializeLevel2Spiders();
-        } else {
-            initializeSpiders(); // Default to level1 spiders
+        // Initialize tripwires (if enabled)
+        tripWires = new ArrayList<>();
+        if (currentConfig.getMechanicsEnabled().isTripWiresEnabled()) {
+            for (Point pos : currentConfig.getTripWirePositions()) {
+                tripWires.add(new TripWire(pos.x, pos.y));
+            }
         }
 
-        // Level-specific snail initialization
-        List<Snail.SnailLocation> snailLocations;
-        if (currentLevel.equals("level2")) {
-            snailLocations = initializeLevel2SnailLocations();
+        // Initialize toy (if enabled)
+        Point toySpawn = currentConfig.getToySpawn();
+        if (currentConfig.getMechanicsEnabled().isToyEnabled() && toySpawn != null) {
+            toy = new Toy();
+            toy.setSpawnLocationPixels(toySpawn.x, toySpawn.y);
         } else {
-            snailLocations = initializeSnailLocations(); // Default to level1 snails
+            toy = null;
+        }
+
+        // Initialize spiders from config
+        spiders = new ArrayList<>();
+        for (SpiderPatrolData patrol : currentConfig.getSpiderPatrols()) {
+            spiders.add(new Spider(patrol.getWaypoints()));
+        }
+
+        // Initialize snail from config
+        List<Snail.SnailLocation> snailLocations = new ArrayList<>();
+        for (SnailLocationData data : currentConfig.getSnailLocations()) {
+            snailLocations.add(new Snail.SnailLocation(
+                data.getPosition(),
+                data.getDialogue(),
+                data.isInteractionRequired()
+            ));
         }
         snail = new Snail(player, snailLocations);
         snailHasTeleported = true;
         nextSnailLocationIndex = 1;
         playerHasInteractedWithSnail = false;
 
+        // Initialize food from config
         foods = new ArrayList<>();
-        spawnFood();
+        boolean speedBoostEnabled = currentConfig.getMechanicsEnabled().isSpeedBoostFoodEnabled();
+        for (FoodSpawnData foodData : currentConfig.getFoodSpawns()) {
+            // Skip ENERGY_SEED if speed boost food is disabled
+            if (foodData.isSpeedBoostFood() && !speedBoostEnabled) {
+                continue;
+            }
+            Point tile = foodData.getTilePosition();
+            int x = tile.x * World.TILE_SIZE + (World.TILE_SIZE / 4);
+            int y = tile.y * World.TILE_SIZE + (World.TILE_SIZE / 4);
+            foods.add(new Food(x, y, 20, foodData.getType()));
+        }
+        logger.debug("Food spawned: {} items for {}", foods.size(), currentLevel);
 
         soundManager.stopAllSounds();
         soundManager.loopSound("music");
@@ -109,11 +149,6 @@ public class PlayingState extends GameState {
         isPaused = false;
 
         hasBeenInitialized = true;
-    }
-
-    private void initTripWires() {
-        tripWires.add(new TripWire(1718, 1770));
-        tripWires.add(new TripWire(800, 2400));
     }
 
     public void restart() {
@@ -441,7 +476,8 @@ public class PlayingState extends GameState {
             player.movingRight = true;
         }
 
-        if (keyCode == KeyEvent.VK_SHIFT) {
+        // Dash ability (only if enabled for this level)
+        if (keyCode == KeyEvent.VK_SHIFT && currentConfig.getMechanicsEnabled().isDashEnabled()) {
             int dirX = 0, dirY = 0;
             if (player.movingUp)
                 dirY = -1;
@@ -470,12 +506,13 @@ public class PlayingState extends GameState {
             if (snail != null && snail.canInteract(player)) {
                 snail.interact();
                 playerHasInteractedWithSnail = true;
-            } else if (toy != null && toy.canPickUp(player)) {
+            } else if (toy != null && currentConfig.getMechanicsEnabled().isToyEnabled() && toy.canPickUp(player)) {
                 toy.pickUp(player);
             }
         }
 
-        if (keyCode == KeyEvent.VK_F) {
+        // Toy throw (only if toy mechanic is enabled)
+        if (keyCode == KeyEvent.VK_F && currentConfig.getMechanicsEnabled().isToyEnabled()) {
             if (toy != null && toy.isCarried()) {
                 toy.throwToy(player.getCenterX(), player.getCenterY(), player.getFacingDirection());
                 soundManager.playSound("throw");
@@ -548,173 +585,15 @@ public class PlayingState extends GameState {
                 y + height > cameraY);
     }
 
-    private void initializeSpiders() {
-        List<Point> patrolPath1 = new ArrayList<>();
-        patrolPath1.add(new Point(23, 23));
-        patrolPath1.add(new Point(29, 23));
-        patrolPath1.add(new Point(29, 25));
-        patrolPath1.add(new Point(23, 25));
-        patrolPath1.add(new Point(23, 23));
-
-        List<Point> patrolPath2 = new ArrayList<>();
-        patrolPath2.add(new Point(2, 2));
-        patrolPath2.add(new Point(8, 2));
-        patrolPath2.add(new Point(8, 7));
-        patrolPath2.add(new Point(2, 7));
-        patrolPath2.add(new Point(2, 2));
-
-        List<Point> patrolPath3 = new ArrayList<>();
-        patrolPath3.add(new Point(26, 1));
-        patrolPath3.add(new Point(26, 10));
-        patrolPath3.add(new Point(26, 1));
-
-        List<Point> patrolPath4 = new ArrayList<>();
-        patrolPath4.add(new Point(7, 10));
-        patrolPath4.add(new Point(15, 10));
-        patrolPath4.add(new Point(15, 15));
-        patrolPath4.add(new Point(7, 15));
-        patrolPath4.add(new Point(7, 10));
-
-        spiders.add(new Spider(patrolPath1));
-        spiders.add(new Spider(patrolPath2));
-        spiders.add(new Spider(patrolPath3));
-        spiders.add(new Spider(patrolPath4));
-    }
-
-    private void initializeLevel2Spiders() {
-        // Initialize spiders for level 2 - more dangerous patrols
-        List<Point> patrol1 = new ArrayList<>();
-        patrol1.add(new Point(5, 8));
-        patrol1.add(new Point(10, 8));
-        patrol1.add(new Point(10, 15));
-        patrol1.add(new Point(5, 15));
-        patrol1.add(new Point(5, 8));
-
-        List<Point> patrol2 = new ArrayList<>();
-        patrol2.add(new Point(14, 20)); // Changed from 15
-        patrol2.add(new Point(22, 20)); // Changed from 25
-        patrol2.add(new Point(22, 35)); // Changed from 25
-        patrol2.add(new Point(14, 35)); // Changed from 15
-        patrol2.add(new Point(14, 20)); // Changed from 15
-
-        List<Point> patrol3 = new ArrayList<>();
-        patrol3.add(new Point(2, 28));
-        patrol3.add(new Point(12, 28));
-        patrol3.add(new Point(12, 40));
-        patrol3.add(new Point(2, 40));
-        patrol3.add(new Point(2, 28));
-
-        List<Point> patrol4 = new ArrayList<>();
-        patrol4.add(new Point(18, 50)); // Changed from 20
-        patrol4.add(new Point(23, 50)); // Changed from 30
-        patrol4.add(new Point(23, 63)); // Changed from 30
-        patrol4.add(new Point(18, 63)); // Changed from 20
-        patrol4.add(new Point(18, 50)); // Changed from 20
-
-        spiders = new ArrayList<>();
-        spiders.add(new Spider(patrol1));
-        spiders.add(new Spider(patrol2));
-        spiders.add(new Spider(patrol3));
-        spiders.add(new Spider(patrol4));
-    }
-
-    private List<Snail.SnailLocation> initializeSnailLocations() {
-        List<Snail.SnailLocation> locations = new ArrayList<>();
-        locations.add(new Snail.SnailLocation(
-                new Point(534, 2464),
-                new String[] { "Hello little one...", "Be careful of the spiders!" },
-                true));
-        locations.add(new Snail.SnailLocation(
-                new Point(938, 1754),
-                new String[] { "You shouldn't stay hungry", "Eat these berries.", "These give you energy" },
-                true));
-        locations.add(new Snail.SnailLocation(
-                new Point(1116, 976),
-                new String[] { "There are dark shadows.", "You can hide from the spiders in it" },
-                true));
-        locations.add(new Snail.SnailLocation(
-                new Point(2166, 136),
-                new String[] { "Stay safe", "Climb these ladders to the next floor.", "Farewell little one...!" },
-                true));
-        return locations;
-    }
-
-    private List<Snail.SnailLocation> initializeLevel2SnailLocations() {
-        List<Snail.SnailLocation> locations = new ArrayList<>();
-        locations.add(new Snail.SnailLocation(
-                new Point(184, 1856),
-                new String[] { "Welcome to the second floor...", "The spiders here are more aggressive!" },
-                true));
-        locations.add(new Snail.SnailLocation(
-                new Point(684, 1144),
-                new String[] { "I sense danger ahead...", "Stay alert and move carefully." },
-                true));
-        locations.add(new Snail.SnailLocation(
-                new Point(1304, 704),
-                new String[] { "The shadows grow deeper here.", "Use them wisely..." },
-                true));
-        locations.add(new Snail.SnailLocation(
-                new Point(1876, 280),
-                new String[] { "You're almost there...", "The next floor awaits...", "Be brave, little one!" },
-                true));
-        return locations;
-    }
-
-    private void spawnFoodAtTile(int tileX, int tileY, Food.FoodType type) {
-        int x = tileX * World.TILE_SIZE + (World.TILE_SIZE / 4);
-        int y = tileY * World.TILE_SIZE + (World.TILE_SIZE / 4);
-        foods.add(new Food(x, y, 20, type));
-    }
-
-    // 2. Replace the old spawnFood() method with this "Manual Control" version
-    private void spawnFood() {
-        foods = new ArrayList<>();
-
-        // Level-specific food spawning
-        if (currentLevel.equals("level1")) {
-            spawnFoodForLevel1();
-        } else if (currentLevel.equals("level2")) {
-            spawnFoodForLevel2();
-        } else if (currentLevel.equals("level_test")) {
-            spawnFoodForLevel1(); // Use level1 layout for test level
-        }
-
-        logger.debug("Food spawned: {} items for {}", foods.size(), currentLevel);
-    }
-
-    private void spawnFoodForLevel1() {
-        // The easy snacks
-        spawnFoodAtTile(16, 27, Food.FoodType.BERRY);
-        spawnFoodAtTile(34, 25, Food.FoodType.BERRY);
-
-        // The strategic boosts (Green!)
-        spawnFoodAtTile(22, 10, Food.FoodType.ENERGY_SEED);
-        spawnFoodAtTile(15, 15, Food.FoodType.ENERGY_SEED);
-
-        // More berries...
-        spawnFoodAtTile(5, 5, Food.FoodType.BERRY);
-    }
-
-    private void spawnFoodForLevel2() {
-        // Level 2 has more food spread across multiple chambers
-        // Bottom chambers
-        spawnFoodAtTile(4, 52, Food.FoodType.BERRY);
-        spawnFoodAtTile(10, 54, Food.FoodType.BERRY);
-        spawnFoodAtTile(18, 56, Food.FoodType.ENERGY_SEED);
-
-        // Middle section
-        spawnFoodAtTile(8, 35, Food.FoodType.BERRY);
-        spawnFoodAtTile(22, 32, Food.FoodType.ENERGY_SEED);
-        spawnFoodAtTile(4, 28, Food.FoodType.BERRY);
-
-        // Upper chambers
-        spawnFoodAtTile(8, 12, Food.FoodType.BERRY);
-        spawnFoodAtTile(18, 15, Food.FoodType.ENERGY_SEED);
-        spawnFoodAtTile(28, 8, Food.FoodType.BERRY);
-
-        // Strategic high-value locations
-        spawnFoodAtTile(14, 20, Food.FoodType.ENERGY_SEED);
-    }
+    // ============================================================
+    // OLD LEVEL-SPECIFIC METHODS (Removed - now in levels/ package)
+    // 
+    // Spider patrols   → See Level1Config.java, Level2Config.java, etc.
+    // Snail locations  → See Level1Config.java, Level2Config.java, etc.
+    // Food spawns      → See Level1Config.java, Level2Config.java, etc.
+    // TripWires        → See LevelTestConfig.java
+    // Toy spawn        → See LevelTestConfig.java
+    // ============================================================
 
     public boolean isInitialized() {
         return hasBeenInitialized;
