@@ -51,3 +51,58 @@
 2026-01-28 13:54:07.753 [Thread-0] WARN  com.buglife.utils.PerformanceMonitor - FPS drop detected: {:.1f} FPS (target: 52.42334322453017)
 2026-01-28 13:54:08.533 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 174 MB / 254 MB (max: 2994 MB)
 2026-01-28 13:54:08.764 [Thread-0] WARN  com.buglife.utils.PerformanceMonitor - FPS drop detected: {:.1f} FPS (target: 52.42334322453017)
+2026-01-28 14:10:37.694 [main] INFO  com.buglife.config.ConfigManager - Configuration files loaded successfully
+2026-01-28 14:10:37.698 [main] INFO  com.buglife.main.Game - Target FPS set to: 60
+2026-01-28 14:10:39.488 [main] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/ui/main_bg.png
+2026-01-28 14:10:39.520 [main] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/ui/logo.png
+2026-01-28 14:10:41.113 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/floor_1.png
+2026-01-28 14:10:41.118 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/wall_5.png
+2026-01-28 14:10:41.122 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/wall.png
+2026-01-28 14:10:41.128 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/sticky_floor.png
+2026-01-28 14:10:41.137 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/broken_tile.png
+2026-01-28 14:10:41.143 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/shadow_tile.png
+2026-01-28 14:10:41.147 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/stain_1.png
+2026-01-28 14:10:41.152 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/stain_2.png
+2026-01-28 14:10:41.154 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/stain_3.png
+2026-01-28 14:10:41.159 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/stain_4.png
+2026-01-28 14:10:41.163 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/introtile1.png
+2026-01-28 14:10:41.166 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/introtile2.png
+2026-01-28 14:10:41.170 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/introtile3.png
+2026-01-28 14:10:41.175 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/introtile4.png
+2026-01-28 14:10:41.178 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/introtile5.png
+2026-01-28 14:10:41.184 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/introtile6.png
+2026-01-28 14:10:41.188 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/plank1.png
+2026-01-28 14:10:41.193 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/plank2.png
+2026-01-28 14:10:41.198 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/plank3.png
+2026-01-28 14:10:41.201 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/plank4.png
+2026-01-28 14:10:41.206 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/l1.png
+2026-01-28 14:10:41.210 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/l2.png
+2026-01-28 14:10:41.215 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/l3.png
+2026-01-28 14:10:41.219 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/l4.png
+2026-01-28 14:10:41.223 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/sack_w1.png
+2026-01-28 14:10:41.227 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/sack_w2.png
+2026-01-28 14:10:41.231 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/sack_w3.png
+2026-01-28 14:10:41.235 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/tiles/sack_w4.png
+2026-01-28 14:10:41.249 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/player/pla.png
+2026-01-28 14:10:41.252 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/player/webbed_state.png
+2026-01-28 14:10:41.263 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/items/toy1.png
+2026-01-28 14:10:41.269 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/spider/Walk_0001.png
+2026-01-28 14:10:41.274 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/spider/Walk_0002.png
+2026-01-28 14:10:41.281 [AWT-EventQueue-0] DEBUG com.buglife.assets.AssetManager - Loaded image: /res/sprites/snail/snail.png
+2026-01-28 14:10:41.283 [AWT-EventQueue-0] DEBUG com.buglife.states.PlayingState - Food spawned: 5 items
+2026-01-28 14:10:44.932 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 168 MB / 204 MB (max: 2994 MB)
+2026-01-28 14:10:45.340 [AWT-EventQueue-0] INFO  com.buglife.utils.PerformanceMonitor - Debug overlay: ON
+2026-01-28 14:10:49.940 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 186 MB / 204 MB (max: 2994 MB)
+2026-01-28 14:10:54.951 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 97 MB / 204 MB (max: 2994 MB)
+2026-01-28 14:10:59.961 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 115 MB / 204 MB (max: 2994 MB)
+2026-01-28 14:11:04.966 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 135 MB / 204 MB (max: 2994 MB)
+2026-01-28 14:11:08.150 [Thread-0] WARN  com.buglife.utils.PerformanceMonitor - FPS drop detected: {:.1f} FPS (target: 50.04906771344456)
+2026-01-28 14:11:09.154 [Thread-0] WARN  com.buglife.utils.PerformanceMonitor - FPS drop detected: {:.1f} FPS (target: 52.788844621513945)
+2026-01-28 14:11:09.972 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 151 MB / 204 MB (max: 2994 MB)
+2026-01-28 14:11:14.972 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 105 MB / 204 MB (max: 2994 MB)
+2026-01-28 14:11:19.979 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 122 MB / 204 MB (max: 2994 MB)
+2026-01-28 14:11:24.989 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 140 MB / 204 MB (max: 2994 MB)
+2026-01-28 14:11:29.993 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 159 MB / 204 MB (max: 2994 MB)
+2026-01-28 14:11:34.347 [Thread-0] WARN  com.buglife.utils.PerformanceMonitor - FPS drop detected: {:.1f} FPS (target: 51.79282868525896)
+2026-01-28 14:11:34.747 [AWT-EventQueue-0] INFO  com.buglife.utils.PerformanceMonitor - Debug overlay: OFF
+2026-01-28 14:11:34.994 [Thread-0] DEBUG com.buglife.utils.PerformanceMonitor - Memory: 103 MB / 204 MB (max: 2994 MB)

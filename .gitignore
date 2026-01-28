@@ -21,3 +21,9 @@ mvnw.cmd
 # Ignore OS generated files
 Thumbs.db
 .DS_Store
+
+# Ignore logging files
+logs/
+logback.xml
+*.log
+lullaby.log
