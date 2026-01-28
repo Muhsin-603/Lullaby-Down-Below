@@ -162,7 +162,7 @@ public class GamePanel extends JPanel {
             
             y += 20;
             String detectionStatus = monitor.isSpiderDetectionEnabled() ? "[X] Detection Enabled" : "[ ] Detection Disabled";
-            g.drawString(detectionStatus + " (Press D)", 20, y);
+            g.drawString(detectionStatus + " (Press Y)", 20, y);
             
             y += 20;
             g.setColor(Color.GRAY);
@@ -219,7 +219,7 @@ public class GamePanel extends JPanel {
             }
             
             // D key toggles spider detection (when spider menu is visible)
-            if (e.getKeyCode() == KeyEvent.VK_D && monitor.isSpiderTogglesVisible()) {
+            if (e.getKeyCode() == KeyEvent.VK_Y && monitor.isSpiderTogglesVisible()) {
                 monitor.toggleSpiderDetection();
                 return;
             }
