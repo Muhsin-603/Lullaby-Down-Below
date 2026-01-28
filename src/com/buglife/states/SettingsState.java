@@ -110,7 +110,7 @@ public class SettingsState extends GameState {
         // Percentage text
         g.setFont(VALUE_FONT);
         String percent = (int)(volume * 100) + "%";
-        int percentWidth = g.getFontMetrics().stringWidth(percent);
+        // int percentWidth = g.getFontMetrics().stringWidth(percent);
         g.drawString(percent, x + width + 20, y + 22);
     }
 
