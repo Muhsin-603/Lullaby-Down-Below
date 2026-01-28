@@ -1,9 +1,0 @@
-{
-  "spiderPatrolEnabled": false,
-  "spiderDetectionEnabled": false,
-  "showHitboxes": false,
-  "showTileGrid": false,
-  "showSpiderPaths": false,
-  "godMode": false,
-  "showDebugOverlay": false
-}
