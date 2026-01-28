@@ -10,7 +10,7 @@ import java.awt.*;
 public class World {
     public static final int TILE_SIZE = 64; // The size of each tile in pixels
 
-    private Tile[] tileTypes; // An array to hold our different tile types (floor, wall, etc.)
+    private static Tile[] tileTypes; // An array to hold our different tile types (floor, wall, etc.)
     private int[][] mapData; // The 2D array that is our level design
 
     public int getMapWidth() {
@@ -59,13 +59,13 @@ public class World {
     // Add this method to your World.java class
     public boolean isTileSolid(int worldX, int worldY) {
         // Convert world pixel coordinates to map grid coordinates
+        if (worldX < 0 || worldY < 0) return true;
+
         int mapCol = worldX / TILE_SIZE;
         int mapRow = worldY / TILE_SIZE;
 
         // First, check if the coordinate is even on the map
-        if (mapRow < 0 || mapRow >= mapData.length || mapCol < 0 || mapCol >= mapData[0].length) {
-            return true; // Treat anything outside the map as a solid wall
-        }
+        
 
         // Get the ID of the tile at that grid position
         int tileID = mapData[mapRow][mapCol];
@@ -75,7 +75,11 @@ public class World {
     }
 
     public World() {
-        loadTileTypes();
+        
+        if(tileTypes == null){
+            loadTileTypes();
+        }
+        
         loadMapFromFile("/res/maps/level1.txt");
     }
 

@@ -99,6 +99,8 @@ public class Game implements Runnable {
             lastTime = currentTime;
 
             if (delta >= 1) {
+                long frameStart = System.nanoTime();
+
                 // 1. UPDATE: Update all game logic
                 gamePanel.updateGame();
 
@@ -106,6 +108,22 @@ public class Game implements Runnable {
                 gamePanel.repaint();
 
                 delta--;
+
+                // --- FRAME CAP TO 60 FPS ---
+                long frameEnd = System.nanoTime();
+                long frameTime = frameEnd - frameStart;
+                long targetFrameTime = (long) drawInterval;
+                if (frameTime < targetFrameTime) {
+                    try {
+                        long sleepMillis = (targetFrameTime - frameTime) / 1_000_000;
+                        int sleepNanos = (int) ((targetFrameTime - frameTime) % 1_000_000);
+                        if (sleepMillis > 0 || sleepNanos > 0) {
+                            Thread.sleep(sleepMillis, sleepNanos);
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
             }
         }
     }

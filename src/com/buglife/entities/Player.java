@@ -52,11 +52,11 @@ public class Player {
     private int animationSpeed = 3; // Change sprite every 15 frames. Higher is slower.
     private int currentFrame = 0;
     private PlayerState currentState = PlayerState.IDLE_DOWN;
-    private List<BufferedImage> idleDownFrames;
-    private List<BufferedImage> walkDownFrames;
-    private List<BufferedImage> walkUpFrames;
-    private List<BufferedImage> walkLeftFrames; // New list
-    private List<BufferedImage> walkRightFrames;
+    private static List<BufferedImage> idleDownFrames;
+    private static List<BufferedImage> walkDownFrames;
+    private static List<BufferedImage> walkUpFrames;
+    private static List<BufferedImage> walkLeftFrames; // New list
+    private static List<BufferedImage> walkRightFrames;
     private static final int WEB_ESCAPE_REQUIRED = 4;
     private int webStrength = WEB_ESCAPE_REQUIRED;
     private int webbedTimer = 300;
@@ -288,6 +288,9 @@ public class Player {
     /// res/sprites/player/pla.png"
 
     private void loadAnimations() {
+        if (idleDownFrames != null) {
+            return;
+        }
         idleDownFrames = new ArrayList<>();
         walkDownFrames = new ArrayList<>();
         walkUpFrames = new ArrayList<>();
@@ -461,6 +464,7 @@ public class Player {
                 x -= dashVelX;
                 y -= dashVelY;
                 isDashing = false;
+                dashDuration = 0;
             }
             return; // Skip normal movement while dashing
         }
