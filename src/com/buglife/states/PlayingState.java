@@ -23,6 +23,12 @@ import com.buglife.world.World;
 
 public class PlayingState extends GameState {
     private static final Logger logger = LoggerFactory.getLogger(PlayingState.class);
+    
+    // Level progression
+    private String currentLevel = "level1";
+    private final String[] levelOrder = {"level1", "level2", "level3", "level4", "level5"};
+    private int currentLevelIndex = 0;
+    
     private Player player;
     private List<Spider> spiders;
     private Snail snail;
@@ -68,7 +74,7 @@ public class PlayingState extends GameState {
 
         tripWires = new ArrayList<>();
         initTripWires();
-        world = new World();
+        world = new World(currentLevel);
 
         player = new Player(594, 2484, 32, 32);
 
@@ -100,8 +106,42 @@ public class PlayingState extends GameState {
     }
 
     public void restart() {
+        currentLevel = "level1";
+        currentLevelIndex = 0;
         this.hasBeenInitialized = false;
         init();
+    }
+    
+    public void setLevel(String levelName) {
+        this.currentLevel = levelName;
+        for (int i = 0; i < levelOrder.length; i++) {
+            if (levelOrder[i].equals(levelName)) {
+                currentLevelIndex = i;
+                break;
+            }
+        }
+        this.hasBeenInitialized = false;
+        init();
+    }
+    
+    public void goToNextLevel() {
+        currentLevelIndex++;
+        if (currentLevelIndex >= levelOrder.length) {
+            // All levels complete - return to menu
+            manager.setState(GameStateManager.MENU);
+            return;
+        }
+        currentLevel = levelOrder[currentLevelIndex];
+        this.hasBeenInitialized = false;
+        init();
+    }
+    
+    public String getCurrentLevel() {
+        return currentLevel;
+    }
+    
+    public boolean isLastLevel() {
+        return currentLevelIndex >= levelOrder.length - 1;
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.buglife.assets.SoundManager;
 import com.buglife.states.GameState;
 import com.buglife.states.MenuState;
 import com.buglife.states.PlayingState;
+import com.buglife.states.SettingsState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ public class GameStateManager {
     public static final int PAUSED = 2;
     public static final int GAME_OVER = 3;
     public static final int LEVEL_COMPLETE = 4;
+    public static final int SETTINGS = 5;
 
     private GameState currentState;
     private int nextStateID = -1;
@@ -30,6 +32,7 @@ public class GameStateManager {
     private PlayingState playingState;
 
     private GameOverState gameOverState;
+    private SettingsState settingsState;
     private LevelCompleteState levelCompleteState;
 
     public GameStateManager(SoundManager soundManager, GamePanel gamePanel) {
@@ -42,6 +45,7 @@ public class GameStateManager {
 
         //game over and won game state
         this.gameOverState = new GameOverState(this, soundManager);
+        this.settingsState = new SettingsState(this, soundManager);
         this.levelCompleteState = new LevelCompleteState(this, soundManager);
 
         // Start with menu state
@@ -82,6 +86,9 @@ public class GameStateManager {
                 break;
             case LEVEL_COMPLETE:
                 currentState = levelCompleteState;
+                break;
+            case SETTINGS:
+                currentState = settingsState;
                 break;
             default:
                 logger.error("Unknown state ID: {}", nextStateID);

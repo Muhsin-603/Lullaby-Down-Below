@@ -53,9 +53,12 @@ public class MenuState extends GameState {
                 soundManager.stopSound("menuMusic");
                 manager.getPlayingState().restart();
                 manager.setState(GameStateManager.PLAYING);
-            } else if (selectedOption.equals("Resume")) {
+            } else if (selectedOption.equals("Test Level")) {
                 soundManager.stopSound("menuMusic");
+                manager.getPlayingState().setLevel("level_test");
                 manager.setState(GameStateManager.PLAYING);
+            } else if (selectedOption.equals("Settings")) {
+                manager.setState(GameStateManager.SETTINGS);
             } else if (selectedOption.equals("Quit")) {
                 System.exit(0);
             }
