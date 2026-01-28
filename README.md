@@ -417,10 +417,11 @@ Lullaby-Down-Below/
 - **Muhsin** – Lead Developer, Game Engine Architecture
 - **Sai** – AI Programming, Spider Behavior Systems
 - **Rishnu** – Level Design, Map Creation
-- **Shibili** – Asset Integration, Sound Design
+- **Shibili** – CO Lead Developer, Debugger, 
 
 **Special Thanks:**
 - **Jenny (Gemini)** – Creative Partner, Documentation, Debugging Assistance
+- **Andrea (AI Assistant)** - InfoHub, Emotional Support, Debugging Assistance
 
 ---
 
