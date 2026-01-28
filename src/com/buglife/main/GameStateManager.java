@@ -1,15 +1,18 @@
-package src.com.buglife.main;
+package com.buglife.main;
 
 import java.awt.Graphics2D;
-import src.com.buglife.assets.SoundManager;
-import src.com.buglife.states.GameState;
-import src.com.buglife.states.MenuState;
-import src.com.buglife.states.PlayingState;
+import com.buglife.assets.SoundManager;
+import com.buglife.states.GameState;
+import com.buglife.states.MenuState;
+import com.buglife.states.PlayingState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import src.com.buglife.states.GameOverState;
-import src.com.buglife.states.LevelCompleteState;
+import com.buglife.states.GameOverState;
+import com.buglife.states.LevelCompleteState;
 
 public class GameStateManager {
+    private static final Logger logger = LoggerFactory.getLogger(GameStateManager.class);
     // State constants
     public static final int MENU = 0;
     public static final int PLAYING = 1;
@@ -81,7 +84,7 @@ public class GameStateManager {
                 currentState = levelCompleteState;
                 break;
             default:
-                System.err.println("Unknown state ID: " + nextStateID);
+                logger.error("Unknown state ID: {}", nextStateID);
         }
 
         nextStateID = -1; // Reset the request

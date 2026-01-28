@@ -1,11 +1,14 @@
-package src.com.buglife.entities;
+package com.buglife.entities;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TripWire {
+    private static final Logger logger = LoggerFactory.getLogger(TripWire.class);
     private int x, y;
     private int width = 32, height = 32;
     private boolean broken = false;

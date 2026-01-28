@@ -1,4 +1,4 @@
-package src.com.buglife.entities;
+package com.buglife.entities;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -9,12 +9,17 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import src.com.buglife.assets.SoundManager;
-//import src.com.buglife.entities.Player.PlayerState;
-import src.com.buglife.world.World;
+import com.buglife.assets.SoundManager;
+import com.buglife.assets.AssetManager;
+//import com.buglife.entities.Player.PlayerState;
+import com.buglife.world.World;
 import java.awt.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.buglife.config.TileConstants;
 
 public class Spider {
+    private static final Logger logger = LoggerFactory.getLogger(Spider.class);
     // Core Attributes
     private double x, y;
     private int width = 48, height = 48;
@@ -94,7 +99,7 @@ public class Spider {
         double distance = Math.sqrt(dx * dx + dy * dy);
         int playerTileCol = player.getCenterX() / World.TILE_SIZE;
         int playerTileRow = player.getCenterY() / World.TILE_SIZE;
-        if (world.getTileIdAt(playerTileCol, playerTileRow) == 5) { // Is it a shadow tile?
+        if (world.getTileIdAt(playerTileCol, playerTileRow) == TileConstants.SHADOW_TILE) { // Is it a shadow tile?
             return false; // I can't see anything!
         }
 
@@ -121,11 +126,10 @@ public class Spider {
         walkingFrames = new BufferedImage[TOTAL_FRAMES];
         try {
             // Load the original bug sprites
-            walkingFrames[0] = ImageIO.read(getClass().getResourceAsStream("/res/sprites/spider/Walk_0001.png"));
-            walkingFrames[1] = ImageIO.read(getClass().getResourceAsStream("/res/sprites/spider/Walk_0002.png"));
+            walkingFrames[0] = AssetManager.getInstance().loadImage("/res/sprites/spider/Walk_0001.png");
+            walkingFrames[1] = AssetManager.getInstance().loadImage("/res/sprites/spider/Walk_0002.png");
         } catch (Exception e) {
-            System.err.println("CRASH! Could not load the bug sprites for the enemy.");
-            e.printStackTrace();
+            logger.error("Failed to load spider sprites", e);
         }
     }
     // In Spider.java
@@ -149,8 +153,6 @@ public class Spider {
     // Add this method anywhere inside your Spider class
 
     public void reset() {
-        // System.out.println("Spider is resetting to its starting position.");
-
         // Teleport back to the first point in the patrol path
         if (patrolPath != null && !patrolPath.isEmpty()) {
             this.x = patrolPath.get(0).x - (width / 2.0);
@@ -225,7 +227,6 @@ public class Spider {
                 doPatrol(world);
                 // While patrolling, constantly look for the player.
                 if (canSeePlayer(targetPlayer, world)) {
-                    // System.out.println("SPIDER: TARGET ACQUIRED!");
                     // Drop a GPS pin at our current location. THIS is our post.
                 
                     this.returnPoint = new Point(getCenterX(), getCenterY());
@@ -322,7 +323,6 @@ public class Spider {
                 // --- NEW "MISSION ACCOMPLISHED" CHECK ---
                 // First, check if our target is already webbed.
                 if (targetPlayer.isWebbed()) {
-                    // System.out.println("SPIDER: PREY CAPTURED. RETURNING TO POST.");
                     currentState = SpiderState.RETURNING;// My job here is done.
                     soundManager.stopSound("chasing");
                     soundManager.playSound("music");
@@ -343,7 +343,6 @@ public class Spider {
                     } else {
                         loseSightTimer--;
                         if (loseSightTimer <= 0) {
-                            // System.out.println("SPIDER: TARGET LOST. RETURNING TO POST.");
                             currentState = SpiderState.RETURNING;
                             soundManager.stopSound("chasing");
                             soundManager.playSound("music");
@@ -360,7 +359,6 @@ public class Spider {
 
                 if (distanceToPost < 5) {
                     // We're back! Resume normal patrol.
-                    // System.out.println("SPIDER: RESUMING PATROL.");
                     currentState = SpiderState.PATROLLING;
                     soundManager.stopSound("chasing");
                     soundManager.playSound("music");

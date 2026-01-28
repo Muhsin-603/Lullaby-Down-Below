@@ -1,6 +1,9 @@
-package src.com.buglife.main;
+package com.buglife.main;
 
-import src.com.buglife.assets.SoundManager;
+import com.buglife.assets.SoundManager;
+import com.buglife.utils.PerformanceMonitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.swing.JPanel;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -11,6 +14,7 @@ import java.awt.Color;
  
 
 public class GamePanel extends JPanel {
+    private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
     public static final int VIRTUAL_WIDTH = 1366;
     public static final int VIRTUAL_HEIGHT = 768;
 
@@ -57,12 +61,46 @@ public class GamePanel extends JPanel {
         // --- DELEGATE TO STATE MANAGER ---
         stateManager.draw(g2d);
 
+        // --- DRAW PERFORMANCE OVERLAY ---
+        if (PerformanceMonitor.getInstance().isDebugOverlayEnabled()) {
+            drawPerformanceOverlay(g2d);
+        }
+
         g2d.dispose();
+    }
+
+    private void drawPerformanceOverlay(Graphics2D g) {
+        PerformanceMonitor monitor = PerformanceMonitor.getInstance();
+        
+        // Semi-transparent black background
+        g.setColor(new Color(0, 0, 0, 180));
+        g.fillRect(10, 10, 350, 100);
+        
+        // White text for stats
+        g.setColor(Color.WHITE);
+        g.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 14));
+        
+        int y = 30;
+        g.drawString(String.format("FPS: %.1f (avg: %.1f)", 
+                monitor.getCurrentFPS(), monitor.getAverageFPS()), 20, y);
+        y += 20;
+        g.drawString(String.format("Frames: %d", monitor.getTotalFrames()), 20, y);
+        y += 20;
+        g.drawString(String.format("Memory: %.1f/%.1f MB (%.1f%%)", 
+                monitor.getUsedMemoryMB(), monitor.getMaxMemoryMB(), 
+                monitor.getMemoryUsagePercent()), 20, y);
+        y += 20;
+        g.drawString("Press F3 to toggle", 20, y);
     }
 
     private class KeyInputAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
+            // F3 key toggles performance overlay
+            if (e.getKeyCode() == KeyEvent.VK_F3) {
+                PerformanceMonitor.getInstance().toggleDebugOverlay();
+                return;
+            }
             stateManager.keyPressed(e.getKeyCode());
         }
 

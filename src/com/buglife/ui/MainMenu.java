@@ -1,4 +1,4 @@
-package src.com.buglife.ui;
+package com.buglife.ui;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -7,12 +7,16 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.io.InputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import src.com.buglife.main.Game;
-import src.com.buglife.main.GamePanel; // To get screen dimensions
+import com.buglife.main.Game;
+import com.buglife.main.GamePanel;
+import com.buglife.assets.AssetManager;
 
 
 public class MainMenu {
+    private static final Logger logger = LoggerFactory.getLogger(MainMenu.class);
     public String[] options = {"New Game", "Resume", "Quit"};
     public int currentSelection = 0;
     private BufferedImage backgroundImage;
@@ -26,30 +30,16 @@ public class MainMenu {
     
     private void loadTitle(String path) {
         try {
-            InputStream is = getClass().getResourceAsStream(path);
-            if (is != null) {
-                titleimg = ImageIO.read(is);
-                is.close();
-            } else {
-                System.err.println("Logo adichu poyi guys");
-            }
-        } catch (IOException e) {
-            System.err.println("Logo adichu poyi guys");
-            e.printStackTrace();
+            titleimg = AssetManager.getInstance().loadImage(path);
+        } catch (Exception e) {
+            logger.error("Failed to load title image: {}", path, e);
         }
     }
     private void loadBackgroundImage(String path) {
     try {
-        InputStream is = getClass().getResourceAsStream(path);
-        if (is != null) {
-            backgroundImage = ImageIO.read(is);
-            is.close();
-        } else {
-            System.err.println("Error: myr image kanunnilla : " + path);
-        }
-    } catch (IOException e) {
-        System.err.println("image kittan task annu onnude poyi sheriyakku: " + path);
-        e.printStackTrace();
+        backgroundImage = AssetManager.getInstance().loadImage(path);
+    } catch (Exception e) {
+        logger.error("Failed to load background image: {}", path, e);
     }
 }
 
@@ -85,7 +75,7 @@ public class MainMenu {
         optionFont = Game.Tiny5.deriveFont(Font.PLAIN, 40);
     } else {
         // Use a default fallback font if custom font failed
-        System.err.println("MainMenu: Custom font not loaded, using fallback."); // Optional warning
+        logger.warn("Custom font not loaded, using fallback font");
         optionFont = new Font("Consolas", Font.PLAIN, 40);
     }
    // 3. Draw Menu Options using the selected font

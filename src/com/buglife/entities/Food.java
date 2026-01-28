@@ -1,11 +1,14 @@
-package src.com.buglife.entities;
+package com.buglife.entities;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.AlphaComposite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Food {
+    private static final Logger logger = LoggerFactory.getLogger(Food.class);
     private int x, y;
     private int size;
     

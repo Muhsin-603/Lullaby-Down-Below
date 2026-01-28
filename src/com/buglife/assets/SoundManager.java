@@ -1,4 +1,4 @@
-package src.com.buglife.assets;
+package com.buglife.assets;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
@@ -6,8 +6,11 @@ import java.io.InputStream;
 //import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SoundManager {
+    private static final Logger logger = LoggerFactory.getLogger(SoundManager.class);
 
     private Map<String, Clip> soundClips; // Stores loaded sound effects
 

@@ -1,4 +1,4 @@
-package src.com.buglife.world;
+package com.buglife.world;
 
 import java.awt.image.BufferedImage;
 

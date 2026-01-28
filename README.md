@@ -63,9 +63,30 @@ Play as a lost **baby** crawling through the abandoned underground floors of a n
 3. Survive.
 
 ### For Developers
-1. Clone the repository.
-2. Open in VS Code or IntelliJ.
-3. Run `src.com.buglife.main.Game`.
+
+#### Prerequisites
+- **Java 17+** (Eclipse Adoptium JDK recommended)
+- **Apache Maven 3.9+** (included in project or install globally)
+
+#### Build & Run
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Muhsin-603/Lullaby-Down-Below.git
+   cd Lullaby-Down-Below
+   ```
+
+2. Build with Maven:
+   ```bash
+   mvn clean install
+   ```
+
+3. Run the game:
+   ```bash
+   java -jar target/lullaby-down-below-1.0.0-jar-with-dependencies.jar
+   ```
+   
+   Or run directly in your IDE:
+   - Main class: `com.buglife.main.Game`
 
 ---
 

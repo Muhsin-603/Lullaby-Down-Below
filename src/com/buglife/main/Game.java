@@ -1,23 +1,34 @@
-package src.com.buglife.main;
+package com.buglife.main;
 
 import javax.swing.*;
 
-import src.com.buglife.assets.SoundManager;
+import com.buglife.assets.SoundManager;
+import com.buglife.utils.PerformanceMonitor;
+import com.buglife.config.ConfigManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class Game implements Runnable {
+    private static final Logger logger = LoggerFactory.getLogger(Game.class);
 
     private JFrame window;
     private GamePanel gamePanel;
     private Thread gameThread;
-    private final int FPS = 60; // Our target frames per second
+    private final int FPS; // Target frames per second (loaded from config)
     public static Font Tiny5;
     private SoundManager soundManager;
+    private ConfigManager configManager;
     volatile boolean running = false;
 
     public Game() {
+        // 0. Initialize ConfigManager first
+        configManager = ConfigManager.getInstance();
+        FPS = configManager.getInt("game.targetFPS", 60);
+        logger.info("Target FPS set to: {}", FPS);
+        
         // 1. Load assets first
         loadCustomFont();
         soundManager = new SoundManager();
@@ -50,15 +61,14 @@ public class Game implements Runnable {
     private void loadCustomFont() {
         try (InputStream is = getClass().getResourceAsStream("/res/fonts/Tiny5.ttf")) {
             if (is == null) {
-                System.err.println("ERROR: Font file not found!");
+                logger.error("Font file not found: /res/fonts/Tiny5.ttf");
                 return;
             }
 
             Tiny5 = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(12f);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Tiny5);
         } catch (IOException | FontFormatException e) {
-            System.err.println("ERROR: Failed to load custom font!");
-            e.printStackTrace();
+            logger.error("Failed to load custom font", e);
         }
     }
 
@@ -80,6 +90,9 @@ public class Game implements Runnable {
 
         while (running) {
             long frameStart = System.nanoTime();
+
+            // Update performance monitor
+            PerformanceMonitor.getInstance().update();
 
             // Update and render
             gamePanel.updateGame();
@@ -114,7 +127,7 @@ public class Game implements Runnable {
             if (gameThread != null && gameThread.isAlive()) {
                 gameThread.join(500);
                 if (gameThread.isAlive()) {
-                    System.err.println("Warning: Game thread did not stop cleanly.");
+                    logger.warn("Game thread did not stop cleanly");
                 }
             }
         } catch (InterruptedException e) {

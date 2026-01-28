@@ -10,6 +10,14 @@ bin/
 out/
 target/
 
+# Ignore local Maven installation
+apache-maven-*/
+
+# Ignore Maven wrapper
+.mvn/
+mvnw
+mvnw.cmd
+
 # Ignore OS generated files
 Thumbs.db
 .DS_Store

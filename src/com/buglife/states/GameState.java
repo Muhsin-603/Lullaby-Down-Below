@@ -1,7 +1,7 @@
-package src.com.buglife.states;
+package com.buglife.states;
 
 import java.awt.Graphics2D;
-import src.com.buglife.main.GameStateManager;
+import com.buglife.main.GameStateManager;
 
 public abstract class GameState {
     protected GameStateManager manager;

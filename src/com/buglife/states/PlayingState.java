@@ -1,4 +1,4 @@
-package src.com.buglife.states;
+package com.buglife.states;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -9,17 +9,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
 
-import src.com.buglife.assets.SoundManager;
-import src.com.buglife.entities.Food;
-import src.com.buglife.entities.Player;
-import src.com.buglife.entities.Snail;
-import src.com.buglife.entities.Spider;
-import src.com.buglife.entities.Toy;
-import src.com.buglife.entities.TripWire;
-import src.com.buglife.main.GameStateManager;
-import src.com.buglife.world.World;
+import com.buglife.assets.SoundManager;
+import com.buglife.entities.Food;
+import com.buglife.entities.Player;
+import com.buglife.entities.Snail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.buglife.entities.Spider;
+import com.buglife.entities.Toy;
+import com.buglife.entities.TripWire;
+import com.buglife.main.GameStateManager;
+import com.buglife.world.World;
 
 public class PlayingState extends GameState {
+    private static final Logger logger = LoggerFactory.getLogger(PlayingState.class);
     private Player player;
     private List<Spider> spiders;
     private Snail snail;
@@ -165,7 +168,7 @@ public class PlayingState extends GameState {
         }
 
         if (player.hasDiedFromWeb()) {
-            System.out.println("GAME OVER: Died By Webbed State");
+            logger.info("Game Over: Player died from webbed state");
             soundManager.stopSound("music");
             soundManager.stopSound("chasing");
             soundManager.playSound("gameOver");
@@ -184,7 +187,7 @@ public class PlayingState extends GameState {
 
                 if (distance < requiredDistance) {
                     if (player.getHunger() <= 0) {
-                        System.out.println("GAME OVER: Player caught with zero hunger!");
+                        logger.info("Game Over: Player caught with zero hunger");
                         soundManager.stopSound("music");
                         soundManager.stopSound("chasing");
                         soundManager.playSound("gameOver");
@@ -570,7 +573,7 @@ public class PlayingState extends GameState {
         // More berries...
         spawnFoodAtTile(5, 5, Food.FoodType.BERRY);
         
-        System.out.println("Food spawned: " + foods.size());
+        logger.debug("Food spawned: {} items", foods.size());
     }
 
     private void handleSpiderAlerts() {

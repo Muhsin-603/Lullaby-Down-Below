@@ -1,4 +1,4 @@
-package src.com.buglife.entities;
+package com.buglife.entities;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -6,17 +6,19 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 import java.util.function.IntBinaryOperator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
  
-import src.com.buglife.assets.SoundManager;
-import src.com.buglife.world.World;
+import com.buglife.assets.SoundManager;
+import com.buglife.assets.AssetManager;
+import com.buglife.world.World;
+import com.buglife.config.GameConstants;
+import com.buglife.config.TileConstants;
 
 public class Player {
+    private static final Logger logger = LoggerFactory.getLogger(Player.class);
     // Player attributes
     public String facingDirection = "DOWN"; // Default
-    private static final int DASH_SPEED = 8;
-    private static final int DASH_DURATION = 15; // ticks
-    private static final int DASH_COOLDOWN = 60; // ticks between dashes
-    private static final int DASH_HUNGER_COST = 15; // Hunger consumed per dash
     private int dashDuration = 0;
     private int dashCooldown = 0;
     private double dashVelX = 0;
@@ -25,21 +27,15 @@ public class Player {
     private double x, y;
     private int width, height;
     private double currentSpeed; // How fast we are moving RIGHT NOW
-    private final double NORMAL_SPEED = 1.8; // The default speed
-    private final double SLOW_SPEED = 0.5; // The speed when stuck!
-    private final double BOOST_SPEED = 4.0; // Zoom!
     private int speedBoostTimer = 0;
 
 
-    private int hunger = 100;
-    private final int MAX_HUNGER = 100;
+    private int hunger = GameConstants.Player.MAX_HUNGER;
     private int collisionRadius;
     private int hungerDrainTimer = 0;
     private boolean isCrying = false;
     private int cryDeathTimer = 0; // Timer for death by hunger after crying starts
-    private final int CRY_DEATH_DURATION = 20 * 60;
     private boolean isLowHungerWarningPlayed = false;
-    private final int LOW_HUNGER_THRESHOLD = 0;
     private BufferedImage webbedSprite;
     private boolean onLevelCompleteTile = false;
     private int webbedWidth, webbedHeight;
@@ -49,7 +45,6 @@ public class Player {
 
     // private BufferedImage sprite_walk1, sprite_walk2; // Just our two images
     private int animationTick = 0;
-    private int animationSpeed = 3; // Change sprite every 15 frames. Higher is slower.
     private int currentFrame = 0;
     private PlayerState currentState = PlayerState.IDLE_DOWN;
     private static List<BufferedImage> idleDownFrames;
@@ -57,9 +52,8 @@ public class Player {
     private static List<BufferedImage> walkUpFrames;
     private static List<BufferedImage> walkLeftFrames; // New list
     private static List<BufferedImage> walkRightFrames;
-    private static final int WEB_ESCAPE_REQUIRED = 4;
-    private int webStrength = WEB_ESCAPE_REQUIRED;
-    private int webbedTimer = 300;
+    private int webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED;
+    private int webbedTimer = GameConstants.Player.WEBBED_DEATH_TIMER;
     private boolean diedFromWeb = false;
 
     public boolean isWebbed() {
@@ -84,8 +78,8 @@ public class Player {
     public void eat(Food food) {
         // 1. Restore Hunger
         this.hunger += food.getHungerValue();
-        if (this.hunger > MAX_HUNGER) {
-            this.hunger = MAX_HUNGER;
+        if (this.hunger > GameConstants.Player.MAX_HUNGER) {
+            this.hunger = GameConstants.Player.MAX_HUNGER;
         }
 
         // 2. Check Properties
@@ -99,38 +93,38 @@ public class Player {
     // In Player.java
     public void dash(int directionX, int directionY, SoundManager soundManager) {
         // Check if player has enough hunger and cooldown is ready
-        if (dashCooldown <= 0 && !isDashing && hunger >= DASH_HUNGER_COST) {
+        if (dashCooldown <= 0 && !isDashing && hunger >= GameConstants.Player.DASH_HUNGER_COST) {
             // Normalize direction
             double length = Math.sqrt(directionX * directionX + directionY * directionY);
             if (length > 0) {
-                dashVelX = (directionX / length) * DASH_SPEED;
-                dashVelY = (directionY / length) * DASH_SPEED;
+                dashVelX = (directionX / length) * GameConstants.Player.DASH_SPEED;
+                dashVelY = (directionY / length) * GameConstants.Player.DASH_SPEED;
             } else {
                 // If no direction, dash in the direction the player is facing
                 switch (currentState) {
                     case WALKING_UP:
-                        dashVelY = -DASH_SPEED;
+                        dashVelY = -GameConstants.Player.DASH_SPEED;
                         break;
                     case WALKING_DOWN:
-                        dashVelY = DASH_SPEED;
+                        dashVelY = GameConstants.Player.DASH_SPEED;
                         break;
                     case WALKING_LEFT:
-                        dashVelX = -DASH_SPEED;
+                        dashVelX = -GameConstants.Player.DASH_SPEED;
                         break;
                     case WALKING_RIGHT:
-                        dashVelX = DASH_SPEED;
+                        dashVelX = GameConstants.Player.DASH_SPEED;
                         break;
                     default:
-                        dashVelY = DASH_SPEED; // Default down
+                        dashVelY = GameConstants.Player.DASH_SPEED; // Default down
                 }
             }
 
             isDashing = true;
-            dashDuration = DASH_DURATION;
-            dashCooldown = DASH_COOLDOWN;
+            dashDuration = GameConstants.Player.DASH_DURATION;
+            dashCooldown = GameConstants.Player.DASH_COOLDOWN;
 
             // Consume hunger for the dash
-            this.hunger -= DASH_HUNGER_COST;
+            this.hunger -= GameConstants.Player.DASH_HUNGER_COST;
             if (this.hunger < 0) {
                 this.hunger = 0;
             }
@@ -149,7 +143,7 @@ public class Player {
         this.y = 2484.0;
 
         // Reset hunger and crying state
-        this.hunger = MAX_HUNGER;
+        this.hunger = GameConstants.Player.MAX_HUNGER;
         this.isCrying = false;
         this.diedFromWeb = false;
 
@@ -161,7 +155,7 @@ public class Player {
         // --- THE FIX ---
         // Reset web status completely
         this.webbedTimer = 0;
-        this.webStrength = WEB_ESCAPE_REQUIRED;
+        this.webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED;
         // this.WEB_ESCAPE_REQUIRED = 4;
 
         // Make sure movement flags are off
@@ -183,12 +177,10 @@ public class Player {
     // Add this method to Player.java
     public void getWebbed() {
         if (currentState != PlayerState.WEBBED) {
-            // System.out.println("PLAYER: I'M TRAPPED!");
             currentState = PlayerState.WEBBED;
-            // WEB_ESCAPE_REQUIRED++;
 
-            webbedTimer = 300; // You have 5 seconds to live...
-            webStrength = WEB_ESCAPE_REQUIRED; // ...and 4 taps to escape. Good luck.
+            webbedTimer = GameConstants.Player.WEBBED_DEATH_TIMER; // You have 5 seconds to live...
+            webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED; // ...and 4 taps to escape. Good luck.
             this.currentFrame = 0;
         }
     }
@@ -200,7 +192,7 @@ public class Player {
             // Check for shadow tile transparency
             int playerTileCol = getCenterX() / World.TILE_SIZE;
             int playerTileRow = getCenterY() / World.TILE_SIZE;
-            if (world.getTileIdAt(playerTileCol, playerTileRow) == 5) {
+            if (world.getTileIdAt(playerTileCol, playerTileRow) == TileConstants.SHADOW_TILE) {
                 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
             }
 
@@ -293,12 +285,12 @@ public class Player {
 
         try {
             // Load main sprite sheet
-            BufferedImage spriteSheet = ImageIO.read(getClass().getResourceAsStream("/res/sprites/player/pla.png"));
+            BufferedImage spriteSheet = AssetManager.getInstance().loadImage("/res/sprites/player/pla.png");
 
             // Load webbed state sprite in the same try block
-            webbedSprite = ImageIO.read(getClass().getResourceAsStream("/res/sprites/player/webbed_state.png"));
+            webbedSprite = AssetManager.getInstance().loadImage("/res/sprites/player/webbed_state.png");
             if (webbedSprite == null) {
-                System.err.println("Failed to load webbed state sprite!");
+                logger.error("Failed to load webbed state sprite: /res/sprites/player/webbed_state.png");
             }
 
             // --- Sprite Dimensions ---
@@ -346,8 +338,7 @@ public class Player {
             }
 
         } catch (Exception e) {
-            System.err.println("CRASH! Could not load sprites or slice player sheet!");
-            e.printStackTrace();
+            logger.error("Failed to load player sprites or slice sprite sheet", e);
         }
     }
 
@@ -358,19 +349,19 @@ public class Player {
 
             if (webStrength <= 0) {
                 currentState = PlayerState.IDLE_DOWN;
-                webbedTimer = 300;
-                webStrength = WEB_ESCAPE_REQUIRED;
+                webbedTimer = GameConstants.Player.WEBBED_DEATH_TIMER;
+                webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED;
             }
         }
     }
 
     private void checkLowHunger(SoundManager soundManager) {
-        int hungerPercentage = (hunger * 100) / MAX_HUNGER;
+        int hungerPercentage = (hunger * 100) / GameConstants.Player.MAX_HUNGER;
 
-        if (hungerPercentage <= LOW_HUNGER_THRESHOLD && !isLowHungerWarningPlayed) {
+        if (hungerPercentage <= GameConstants.Player.LOW_HUNGER_THRESHOLD && !isLowHungerWarningPlayed) {
             soundManager.playSound("lowhunger");
             isLowHungerWarningPlayed = true;
-        } else if (hungerPercentage > LOW_HUNGER_THRESHOLD) {
+        } else if (hungerPercentage > GameConstants.Player.LOW_HUNGER_THRESHOLD) {
             isLowHungerWarningPlayed = false;
         }
     }
@@ -390,7 +381,7 @@ public class Player {
                     this.hunger = 0;
                     if (!isCrying) {
                         this.isCrying = true;
-                        this.cryDeathTimer = CRY_DEATH_DURATION;
+                        this.cryDeathTimer = GameConstants.Player.CRY_DEATH_DURATION;
                     }
                 }
             }
@@ -408,7 +399,7 @@ public class Player {
         // Inside Player.java's update() method...
 
         if (speedBoostTimer > 0) {
-            this.currentSpeed = BOOST_SPEED; // Use the boost speed
+            this.currentSpeed = GameConstants.Player.BOOST_SPEED; // Use the boost speed
             speedBoostTimer--;               // Tick down the timer
         } else {
             // Normal logic when not boosted
@@ -416,17 +407,17 @@ public class Player {
             int playerTileRow = getCenterY() / World.TILE_SIZE;
             int tileID = world.getTileIdAt(playerTileCol, playerTileRow);
             
-            if (tileID == 3) { // Sticky floor
-                this.currentSpeed = SLOW_SPEED;
+            if (tileID == TileConstants.STICKY_FLOOR) { // Sticky floor
+                this.currentSpeed = GameConstants.Player.SLOW_SPEED;
             } else {
-                this.currentSpeed = NORMAL_SPEED;
+                this.currentSpeed = GameConstants.Player.NORMAL_SPEED;
             }
         }
         
         int playerTileCol = getCenterX() / World.TILE_SIZE;
         int playerTileRow = getCenterY() / World.TILE_SIZE;
 
-        if (world.getTileIdAt(playerTileCol, playerTileRow) == 37) {
+        if (world.getTileIdAt(playerTileCol, playerTileRow) == TileConstants.LADDER_3) {
             this.onLevelCompleteTile = true;
         } else {
             this.onLevelCompleteTile = false; // Ensure it's false when not on the tile
@@ -525,7 +516,7 @@ public class Player {
             boolean isMoving = movingUp || movingDown || movingLeft || movingRight;
             if (isMoving) {
                 animationTick++;
-                if (animationTick > animationSpeed) {
+                if (animationTick > GameConstants.Player.ANIMATION_SPEED) {
                     animationTick = 0;
                     currentFrame = (currentFrame + 1) % getActiveAnimation().size();
                 }

@@ -1,14 +1,18 @@
-package src.com.buglife.entities;
+package com.buglife.entities;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import src.com.buglife.world.World;
+import com.buglife.world.World;
+import com.buglife.assets.AssetManager;
 
 public class Toy {
+    private static final Logger logger = LoggerFactory.getLogger(Toy.class);
     private double x, y;
     private int width = 24, height = 24;
     private boolean active = false;
@@ -52,10 +56,9 @@ public class Toy {
 
     private void loadSprite() {
         try {
-            sprite = ImageIO.read(getClass().getResourceAsStream("/res/sprites/items/toy1.png"));
-        } catch (IOException | NullPointerException e) {
-            System.err.println("Error loading toy sprite! Drawing fallback box.");
-            e.printStackTrace();
+            sprite = AssetManager.getInstance().loadImage("/res/sprites/items/toy1.png");
+        } catch (Exception e) {
+            logger.error("Failed to load toy sprite, drawing fallback box", e);
             sprite = null;
         }
     }

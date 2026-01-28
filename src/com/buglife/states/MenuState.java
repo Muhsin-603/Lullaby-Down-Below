@@ -1,12 +1,15 @@
-package src.com.buglife.states;
+package com.buglife.states;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import src.com.buglife.assets.SoundManager;
-import src.com.buglife.main.GameStateManager;
-import src.com.buglife.ui.MainMenu;
+import com.buglife.assets.SoundManager;
+import com.buglife.main.GameStateManager;
+import com.buglife.ui.MainMenu;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MenuState extends GameState {
+    private static final Logger logger = LoggerFactory.getLogger(MenuState.class);
     private MainMenu mainMenu;
     private SoundManager soundManager;
 

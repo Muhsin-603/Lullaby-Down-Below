@@ -1,0 +1,45 @@
+{
+  "game": {
+    "title": "Lullaby Down Below",
+    "version": "1.0.0",
+    "targetFPS": 60,
+    "enableVSync": false
+  },
+  "display": {
+    "virtualWidth": 1366,
+    "virtualHeight": 768,
+    "fullscreen": true,
+    "windowTitle": "Lullaby Down Below"
+  },
+  "player": {
+    "normalSpeed": 1.8,
+    "slowSpeed": 0.5,
+    "boostSpeed": 4.0,
+    "maxHunger": 100,
+    "hungerDrainInterval": 120,
+    "dashSpeed": 8,
+    "dashDuration": 15,
+    "dashCooldown": 60,
+    "dashHungerCost": 15
+  },
+  "spider": {
+    "patrolSpeed": 1.0,
+    "chaseSpeed": 3.0,
+    "slowChaseSpeed": 1.7,
+    "investigateSpeed": 3.5,
+    "detectionRadius": 200,
+    "loseSightDuration": 300
+  },
+  "audio": {
+    "masterVolume": 1.0,
+    "musicVolume": 0.8,
+    "sfxVolume": 1.0,
+    "muteAll": false
+  },
+  "debug": {
+    "showHitboxes": false,
+    "showFPS": false,
+    "showCoordinates": false,
+    "godMode": false
+  }
+}

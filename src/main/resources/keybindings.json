@@ -1,0 +1,22 @@
+{
+  "keybindings": {
+    "moveUp": "W",
+    "moveDown": "S",
+    "moveLeft": "A",
+    "moveRight": "D",
+    "dash": "SHIFT",
+    "interact": "E",
+    "pickup": "Q",
+    "drop": "Q",
+    "pause": "ESCAPE",
+    "toggleDebug": "F3",
+    "toggleHitboxes": "F4",
+    "restart": "R"
+  },
+  "alternateKeys": {
+    "moveUp": "UP",
+    "moveDown": "DOWN",
+    "moveLeft": "LEFT",
+    "moveRight": "RIGHT"
+  }
+}

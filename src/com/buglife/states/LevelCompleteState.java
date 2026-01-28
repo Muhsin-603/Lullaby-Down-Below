@@ -1,14 +1,17 @@
-package src.com.buglife.states;
+package com.buglife.states;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import src.com.buglife.main.GamePanel;
-import src.com.buglife.main.GameStateManager;
-import src.com.buglife.assets.SoundManager;
+import com.buglife.main.GamePanel;
+import com.buglife.main.GameStateManager;
+import com.buglife.assets.SoundManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LevelCompleteState extends GameState {
+    private static final Logger logger = LoggerFactory.getLogger(LevelCompleteState.class);
     private SoundManager soundManager;
     private static final Font BIG_FONT = new Font("Consolas", Font.BOLD, 80);
     private static final Font SMALL_FONT = new Font("Consolas", Font.PLAIN, 24);
