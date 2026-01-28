@@ -3,6 +3,7 @@
 ## 📦 Supported Versions
 | Version | Status |
 |--------|---------|
+| **v1.5** | ✅ Supported |
 | **v1.0** | ✅ Supported |
 | **< v1.0** | ❌ Not Supported |
 

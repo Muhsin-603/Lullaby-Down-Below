@@ -6,7 +6,7 @@
 
     <groupId>com.buglife</groupId>
     <artifactId>lullaby-down-below</artifactId>
-    <version>1.0.0</version>
+    <version>1.5.0</version>
     <packaging>jar</packaging>
 
     <name>Lullaby Down Below</name>
@@ -17,7 +17,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <slf4j.version>2.0.9</slf4j.version>
-        <logback.version>1.4.14</logback.version>
+        <logback.version>1.5.25</logback.version>
         <jackson.version>2.16.0</jackson.version>
         <junit.version>5.10.1</junit.version>
     </properties>
@@ -32,8 +32,8 @@
         
         <dependency>
             <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
+            <artifactId>logback-core</artifactId>
+            <version>1.5.25</version>
         </dependency>
 
         <!-- JSON Processing -->
