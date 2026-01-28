@@ -27,3 +27,7 @@ logs/
 logback.xml
 *.log
 lullaby.log
+
+
+# Ignore debug settings (runtime configuration)
+src/main/resources/debug-settings.json
