@@ -47,6 +47,11 @@ public class PerformanceMonitor {
     private boolean spiderDetectionEnabled;
     private boolean showSpiderToggles;
     
+    // Level selection menu
+    private boolean showLevelMenu;
+    private String[] availableLevels = {"level1", "level2", "level3", "level4", "level5"};
+    private int selectedLevelIndex = 0;
+    
     // Player coordinates
     private int playerX;
     private int playerY;
@@ -297,6 +302,68 @@ public class PerformanceMonitor {
         return showSpiderToggles;
     }
     
+    // ========== LEVEL SELECTION MENU ==========
+    
+    /**
+     * Toggle level selection menu visibility
+     */
+    public void toggleLevelMenu() {
+        showLevelMenu = !showLevelMenu;
+        logger.info("Level selection menu: {}", showLevelMenu ? "ON" : "OFF");
+        saveDebugConfig();
+    }
+    
+    /**
+     * Check if level menu should be shown
+     */
+    public boolean isLevelMenuVisible() {
+        return showLevelMenu;
+    }
+    
+    /**
+     * Get array of available levels
+     */
+    public String[] getAvailableLevels() {
+        return availableLevels;
+    }
+    
+    /**
+     * Get selected level index
+     */
+    public int getSelectedLevelIndex() {
+        return selectedLevelIndex;
+    }
+    
+    /**
+     * Set selected level index
+     */
+    public void setSelectedLevelIndex(int index) {
+        if (index >= 0 && index < availableLevels.length) {
+            this.selectedLevelIndex = index;
+        }
+    }
+    
+    /**
+     * Get currently selected level name
+     */
+    public String getSelectedLevel() {
+        return availableLevels[selectedLevelIndex];
+    }
+    
+    /**
+     * Move level selection up
+     */
+    public void levelSelectionUp() {
+        selectedLevelIndex = (selectedLevelIndex - 1 + availableLevels.length) % availableLevels.length;
+    }
+    
+    /**
+     * Move level selection down
+     */
+    public void levelSelectionDown() {
+        selectedLevelIndex = (selectedLevelIndex + 1) % availableLevels.length;
+    }
+    
     // ========== PLAYER COORDINATES ==========
     
     /**
@@ -502,6 +569,7 @@ public class PerformanceMonitor {
                 showSpiderPaths = root.path("showSpiderPaths").asBoolean(false);
                 godMode = root.path("godMode").asBoolean(false);
                 showDebugOverlay = root.path("showDebugOverlay").asBoolean(false);
+                showLevelMenu = root.path("showLevelMenu").asBoolean(false);
                 
                 logger.info("Debug configuration loaded successfully");
             } else {
@@ -531,7 +599,8 @@ public class PerformanceMonitor {
                 "  \"showTileGrid\": %s,\n" +
                 "  \"showSpiderPaths\": %s,\n" +
                 "  \"godMode\": %s,\n" +
-                "  \"showDebugOverlay\": %s\n" +
+                "  \"showDebugOverlay\": %s,\n" +
+                "  \"showLevelMenu\": %s\n" +
                 "}",
                 spiderPatrolEnabled,
                 spiderDetectionEnabled,
@@ -539,7 +608,8 @@ public class PerformanceMonitor {
                 showTileGrid,
                 showSpiderPaths,
                 godMode,
-                showDebugOverlay
+                showDebugOverlay,
+                showLevelMenu
             );
             
             // Write to file
@@ -565,6 +635,7 @@ public class PerformanceMonitor {
         godMode = false;
         showDebugOverlay = false;
         showSpiderToggles = false;
+        showLevelMenu = false;
     }
     
     /**
