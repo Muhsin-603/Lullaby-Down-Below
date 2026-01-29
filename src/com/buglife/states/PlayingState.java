@@ -464,6 +464,11 @@ public class PlayingState extends GameState {
         if (isPaused) {
             drawPauseMenu(g);
         }
+        
+        // Draw level selection menu overlay (on top of everything)
+        if (PerformanceMonitor.getInstance().isLevelMenuVisible()) {
+            drawLevelSelectionMenu(g);
+        }
     }
 
     private void drawHUD(Graphics2D g) {
@@ -569,6 +574,53 @@ public class PlayingState extends GameState {
                     VIRTUAL_HEIGHT / 2 + i * 60);
         }
     }
+    
+    private void drawLevelSelectionMenu(Graphics2D g) {
+        // Semi-transparent overlay
+        g.setColor(new Color(0, 0, 0, 200));
+        g.fillRect(VIRTUAL_WIDTH / 2 - 200, VIRTUAL_HEIGHT / 2 - 200, 400, 400);
+        
+        // Border
+        g.setColor(Color.WHITE);
+        g.setStroke(new BasicStroke(3));
+        g.drawRect(VIRTUAL_WIDTH / 2 - 200, VIRTUAL_HEIGHT / 2 - 200, 400, 400);
+        
+        // Title
+        g.setFont(MID_FONT);
+        String title = "Select Level";
+        int titleWidth = g.getFontMetrics().stringWidth(title);
+        g.drawString(title, VIRTUAL_WIDTH / 2 - titleWidth / 2, VIRTUAL_HEIGHT / 2 - 150);
+        
+        // Level options
+        g.setFont(new Font("Consolas", Font.BOLD, 24));
+        String[] levels = PerformanceMonitor.getInstance().getAvailableLevels();
+        int selectedIndex = PerformanceMonitor.getInstance().getSelectedLevelIndex();
+        
+        for (int i = 0; i < levels.length; i++) {
+            int y = VIRTUAL_HEIGHT / 2 - 80 + (i * 45);
+            
+            // Highlight selected level
+            if (i == selectedIndex) {
+                g.setColor(Color.YELLOW);
+                g.fillRect(VIRTUAL_WIDTH / 2 - 180, y - 25, 360, 35);
+                g.setColor(Color.BLACK);
+            } else {
+                g.setColor(Color.WHITE);
+            }
+            
+            // Format level name nicely: "level1" -> "Level 1"
+            String displayName = "Level " + levels[i].substring(5);
+            int nameWidth = g.getFontMetrics().stringWidth(displayName);
+            g.drawString(displayName, VIRTUAL_WIDTH / 2 - nameWidth / 2, y);
+        }
+        
+        // Instructions
+        g.setColor(Color.LIGHT_GRAY);
+        g.setFont(new Font("Consolas", Font.PLAIN, 14));
+        String instructions = "↑/↓ Navigate  |  ENTER Select  |  L/ESC Cancel";
+        int instrWidth = g.getFontMetrics().stringWidth(instructions);
+        g.drawString(instructions, VIRTUAL_WIDTH / 2 - instrWidth / 2, VIRTUAL_HEIGHT / 2 + 150);
+    }
 
     @Override
     public void keyPressed(int keyCode) {
@@ -631,6 +683,35 @@ public class PlayingState extends GameState {
                 toy.throwToy(player.getCenterX(), player.getCenterY(), player.getFacingDirection());
                 soundManager.playSound("throw");
             }
+        }
+        
+        // L key: Toggle level selection menu
+        if (keyCode == KeyEvent.VK_L) {
+            PerformanceMonitor.getInstance().toggleLevelMenu();
+            return;
+        }
+        
+        // Handle level menu navigation when visible
+        if (PerformanceMonitor.getInstance().isLevelMenuVisible()) {
+            if (keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_W) {
+                PerformanceMonitor.getInstance().levelSelectionUp();
+                soundManager.playSound("menu");
+                return;
+            }
+            if (keyCode == KeyEvent.VK_DOWN || keyCode == KeyEvent.VK_S) {
+                PerformanceMonitor.getInstance().levelSelectionDown();
+                soundManager.playSound("menu");
+                return;
+            }
+            if (keyCode == KeyEvent.VK_ENTER) {
+                String selectedLevel = PerformanceMonitor.getInstance().getSelectedLevel();
+                setLevel(selectedLevel);
+                PerformanceMonitor.getInstance().toggleLevelMenu();
+                logger.info("Switched to level: {}", selectedLevel);
+                return;
+            }
+            // ESC closes the level menu without selecting
+            // (will be handled by pause menu check above)
         }
         
         // F12: Export game state for debugging
