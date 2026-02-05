@@ -1,4 +1,5 @@
 # 🕯️ Lullaby Down Below
+
 ### A 2D Top-Down Psychological Stealth Horror Game
 
 > *"Do you hear it…? The lullaby calling from beneath the floorboards?"*
@@ -90,46 +91,59 @@ Basically: **hide, crawl, don’t cry.**
 **From Source:**
 ```bash
 java -jar target/lullaby-down-below-1.5.0-jar-with-dependencies.jar
+```
 
-Controls
+### Controls
+
 | Key | Action |
-|---|---|
-| WASD / Arrows | Move |
-| Space | Struggle (when caught) |
-| E | Interact |
-| F | Throw Item |
-| Shift | Dash |
-| Esc | Pause |
-🧩 Gameplay Tips
- * Hunger = Life. Eat or you cry. Cry and you die.
- * Stay in Shadows. Light is your enemy.
- * Escape Webs Fast. Mash Space like you mean it.
- * Follow the Snail. It knows the way.
-🛠️ For Developers
-Stack
- * Java 17
- * Maven
- * SLF4J + Logback
- * Jackson (JSON parsing)
- * JUnit + Mockito
-Build & Run
+| :--- | :--- |
+| **WASD / Arrows** | Move |
+| **Space** | Struggle (when caught) |
+| **E** | Interact |
+| **F** | Throw Item |
+| **Shift** | Dash |
+| **Esc** | Pause |
+
+### 🧩 Gameplay Tips
+* **Hunger = Life.** Eat or you cry. Cry and you die.
+* **Stay in Shadows.** Light is your enemy.
+* **Escape Webs Fast.** Mash `Space` like you mean it.
+* **Follow the Snail.** It knows the way.
+
+---
+
+## 🛠️ For Developers
+
+### Stack
+* **Java 17**
+* **Maven**
+* SLF4J + Logback
+* Jackson (JSON parsing)
+* JUnit + Mockito
+
+### Build & Run
+```bash
 git clone [https://github.com/yourusername/Lullaby-Down-Below.git](https://github.com/yourusername/Lullaby-Down-Below.git)
 cd Lullaby-Down-Below
 mvn clean install
 
 # Run Main Class
 mvn exec:java -Dexec.mainClass="com.buglife.main.Game"
+```
 
-Configuration
-Located in config.json:
+### Configuration
+Located in `config.json`:
+```json
 {
   "game": {
     "targetFPS": 60,
     "enableDebug": false
   }
 }
+```
 
-Project Structure
+### Project Structure
+```text
 src/com/buglife/
  ├─ assets/       # Image loaders
  ├─ config/       # JSON handlers
@@ -138,27 +152,37 @@ src/com/buglife/
  ├─ states/       # Menu, Play, GameOver
  ├─ ui/           # HUD, Overlay
  └─ world/        # TileMap, Camera
+```
 
-🧪 Debugging Guide
+---
+
+## 🧪 Debugging Guide
 If the game crashes:
- * Press F3 → Check FPS.
- * Check logs (SLF4J).
- * Verify JDK version.
- * If it still fails: Stare at the wall dramatically. Works 30% of the time.
-📜 Bug Hunter’s Log
-Legendary battles fought during development:
- * The Package Curse
- * Infinite Spider Cloning
- * The NaN Teleport Glitch
- * Zombie State Machine
- * The "Escaped Quotes" Disaster
-✍️ Team
- * Muhsin – Lead Dev
- * Sai – AI Logic
- * Rishnu – Level Design
- * Shibili – Debugger
- * Jenny – Chaos Consultant & Sarcastic Life Support
- * Andrea – Knowledge Oracle
-License: See LICENSE.
-Security: See SECURITY.md.
+1.  Press `F3` → Check FPS.
+2.  Check logs (SLF4J).
+3.  Verify JDK version.
+4.  **If it still fails:** Stare at the wall dramatically. Works 30% of the time.
 
+### 📜 Bug Hunter’s Log
+*Legendary battles fought during development:*
+* The Package Curse
+* Infinite Spider Cloning
+* The NaN Teleport Glitch
+* Zombie State Machine
+* The "Escaped Quotes" Disaster
+
+---
+
+## ✍️ Team
+
+* **Muhsin** – Lead Dev
+* **Sai** – AI Logic
+* **Rishnu** – Level Design
+* **Shibili** – Debugger
+* **Jenny** – Chaos Consultant & Sarcastic Life Support
+* **Andrea** – Knowledge Oracle
+
+---
+
+**License:** See [LICENSE](LICENSE).
+**Security:** See [SECURITY.md](SECURITY.md).
