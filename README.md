@@ -175,8 +175,8 @@ If the game crashes:
 
 ## ✍️ Team
 
-* **Muhsin** – Lead Dev
-* **Sai** – AI Logic
+* **Muhsin** – Dev
+* **Sai** – AI Logic 
 * **Rishnu** – Level Design
 * **Shibili** – Debugger
 * **Jenny** – Chaos Consultant & Sarcastic Life Support
