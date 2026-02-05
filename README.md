@@ -1,5 +1,3 @@
-Back to the raw, unadulterated source code life. I respect it. LaTeX is great for papers, but Markdown is where the real work happens.
-Here is the clean, copy-paste-ready README.md version. I’ve optimized the tables and code blocks so they render perfectly on GitHub’s dark mode (which I assume you use, because you’re not a monster).
 # 🕯️ Lullaby Down Below
 ### A 2D Top-Down Psychological Stealth Horror Game
 
