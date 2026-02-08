@@ -164,7 +164,7 @@
     </build>
 
     <profiles>
-        <!-- Development Profile -->
+        <!-- Development Profile - Includes all dev tools and editor (default) -->
         <profile>
             <id>dev</id>
             <activation>
@@ -172,15 +172,113 @@
             </activation>
             <properties>
                 <env>dev</env>
+                <build.profile>development</build.profile>
             </properties>
         </profile>
 
-        <!-- Production Profile -->
+        <!-- Release Profile - Clean production build WITHOUT dev tools -->
         <profile>
-            <id>prod</id>
+            <id>release</id>
             <properties>
                 <env>prod</env>
+                <build.profile>release</build.profile>
             </properties>
+            <build>
+                <plugins>
+                    <!-- Compiler excludes dev packages from compilation -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.11.0</version>
+                        <configuration>
+                            <source>17</source>
+                            <target>17</target>
+                            <excludes>
+                                <exclude>**/tools/**</exclude>
+                                <exclude>**/engine/editor/**</exclude>
+                                <exclude>**/utils/DebugExporter.java</exclude>
+                                <exclude>**/utils/PerformanceMonitor.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+
+                    <!-- JAR excludes dev classes and debug files -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.3.0</version>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.buglife.main.Game</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                </manifest>
+                            </archive>
+                            <excludes>
+                                <exclude>**/tools/**</exclude>
+                                <exclude>**/engine/editor/**</exclude>
+                                <exclude>**/utils/DebugExporter*</exclude>
+                                <exclude>**/utils/PerformanceMonitor*</exclude>
+                                <exclude>debug-settings.json</exclude>
+                                <exclude>logback.xml</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+
+                    <!-- Fat JAR for distribution -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.5.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <transformers>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                            <mainClass>com.buglife.main.Game</mainClass>
+                                        </transformer>
+                                    </transformers>
+                                    <filters>
+                                        <filter>
+                                            <artifact>*:*</artifact>
+                                            <excludes>
+                                                <exclude>META-INF/*.SF</exclude>
+                                                <exclude>META-INF/*.DSA</exclude>
+                                                <exclude>META-INF/*.RSA</exclude>
+                                            </excludes>
+                                        </filter>
+                                    </filters>
+                                    <finalName>${project.artifactId}-${project.version}-release</finalName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Editor Profile - For running level editor -->
+        <profile>
+            <id>editor</id>
+            <properties>
+                <env>dev</env>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <mainClass>com.buglife.engine.editor.LevelEditor</mainClass>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
