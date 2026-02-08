@@ -122,14 +122,7 @@ java -jar target/lullaby-down-below-1.5.0-jar-with-dependencies.jar
 * JUnit + Mockito
 
 ### Build & Run
-```bash
-git clone [https://github.com/yourusername/Lullaby-Down-Below.git](https://github.com/yourusername/Lullaby-Down-Below.git)
-cd Lullaby-Down-Below
-mvn clean install
-
-# Run Main Class
-mvn exec:java -Dexec.mainClass="com.buglife.main.Game"
-```
+For detailed build instructions and contribution guidelines, please refer to [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Configuration
 Located in `config.json`:
