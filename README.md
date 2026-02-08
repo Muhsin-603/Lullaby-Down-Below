@@ -1,181 +1,199 @@
 # 🕯️ Lullaby Down Below
+**A 2D Top-Down Psychological Stealth-Horror Game**
 
-### A 2D Top-Down Psychological Stealth Horror Game
+![Java](https://img.shields.io/badge/Java-17-orange) ![Engine](https://img.shields.io/badge/Engine-Custom_Swing-blue) ![License](https://img.shields.io/badge/License-MIT-green) ![PRs](https://img.shields.io/badge/PRs-Welcome-brightgreen)
+
+[Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [Contributing](#-contributing) • [Roadmap](#-roadmap) • [Team](#-team)
+
+---
+
+## 🎯 What is Lullaby Down Below?
+**Lullaby Down Below** is an atmospheric survival horror experience built entirely from scratch using a custom Java Swing engine. There is no Unity, no Godot, no pre-made physics—just pure code.
+
+You play as a lost **baby bug** crawling through the abandoned underground floors of a nursery. Struggling against hunger and darkness, you are guided by a mystical **snail** and hunted by relentless **spiders**.
 
 > *"Do you hear it…? The lullaby calling from beneath the floorboards?"*
 
-**Lullaby Down Below** is an atmospheric survival horror game built from scratch using a custom Java Swing engine. You play as a fragile baby bug, crawling through abandoned underground nursery floors, guided by a mysterious snail, hunted by relentless spiders, fighting hunger, darkness… and your own noise.
+## The Experience
+Most horror games rely on cheap jump scares. **Lullaby Down Below** relies on tension, resource management, and helplessness.
+*   **Hunger System:** If you don't eat, you cry. If you cry, they hear you.
+*   **Struggle Mechanic:** Getting caught isn't the end—unless you fail to escape the web.
+*   **Stealth:** The shadows are your only weapon against the light.
+
+## Why Play (or Code) This?
+✅ **100% Custom Engine** – Built from the ground up to demonstrate core game programming concepts.  
+✅ **Advanced AI** – Enemies that patrol, listen, and investigate—they don't just walk at you.  
+✅ **Frame-Perfect Timing** – Stable 60 FPS loop with delta-time support.  
+✅ **Developer Friendly** – Includes a comprehensive debug suite (F3/F4/F7) built right in.  
+✅ **Open Source** – No hidden costs, no subscriptions, just code.
 
 ---
 
-## 📚 Table of Contents
-1. [Overview](#-overview)
-2. [Features](#-features)
-3. [Recent Updates](#-recent-updates-v15x)
-4. [For Players](#-for-players)
-5. [For Developers](#-for-developers)
-6. [Team](#-team)
+## 🧑‍💻 Contribution Workflow
+We follow a structured contribution process to keep the codebase clean.
+1.  **Browse Issues**: Check for existing bugs or feature requests.
+2.  **Open an Issue**: If you have a new idea, discuss it first.
+3.  **Wait for Approval**: Maintainers will review your proposal.
+4.  **Start Coding**: Once approved, fork and branch.
+5.  **Submit PR**: Create a Pull Request with a clear description.
 
----
-
-## 🧠 Overview
-
-| Category | Details |
-| :--- | :--- |
-| **Genre** | Psychological Stealth Horror |
-| **Perspective** | 2D Top-Down |
-| **Engine** | Custom Java Swing |
-| **FPS** | Stable 60 |
-| **Levels** | 5 Handcrafted Stages |
-| **Focus** | Stealth, survival, tension, AI behavior |
-
-**You are weak by design.**
-No weapons. No glory. Just survival instincts and panic.
-Basically: **hide, crawl, don’t cry.**
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 
 ---
 
 ## ✨ Features
 
-### 🔧 Custom Engine
-* **Stable 60 FPS** delta-time loop.
-* **Tile-based maps** parsed from `.txt` files.
-* **Viewport Culling** with smooth camera tracking.
-* **Virtual Resolution** scaling (1366×768).
-* **State Machine** architecture (Menu → Playing → GameOver).
-* **Real-time performance monitor**.
+### 🔧 Core Tech
+<details>
+<summary><b>Custom Game Engine</b> (Click to expand)</summary>
+<ul>
+<li>Stable 60 FPS game loop</li>
+<li>Delta-time calculation for smooth movement</li>
+<li>Custom collision detection system</li>
+<li>State management (Menu -> Play -> Win/Loss)</li>
+</ul>
+</details>
 
-### 👶 Core Gameplay
-* **Vulnerable Protagonist:** You are small. Everything else is big.
-* **Hunger System:** Hunger leads to crying. Crying alerts enemies.
-* **Struggle Mechanic:** Got caught? You have a 5-second web death timer.
-* **Stealth:** Utilize shadows for invisibility.
-* **Hazards:** Sticky floors, water, ladders.
+<details>
+<summary><b>Debug System (v1.5.x)</b> (Click to expand)</summary>
+<ul>
+<li><b>F3:</b> Performance Overlay (FPS, Memory, Entity Count)</li>
+<li><b>F4:</b> Hitbox Visualization (Red = Enemy, Green = Player)</li>
+<li><b>F6:</b> AI Pathfinding Vectors</li>
+<li><b>F7:</b> God Mode & Teleport</li>
+<li><b>F12:</b> JSON State Export</li>
+</ul>
+</details>
 
-### 🕷️ Spider AI
-*Because normal enemies are boring.*
-* **Patrol waypoints** & Line-of-sight checks.
-* **Sound detection** & Vision cones.
-* **Chase + Pathfinding** with investigation behavior.
-* **Web immobilization attack**.
-* *Note: These spiders don’t "walk toward player.exe". They think. Like rude coworkers.*
-
-### 🐌 Mystic Snail
-* Guides player through darkness.
-* Teleports between screens.
-* **Acts as your emotional support GPS.**
-
----
-
-## 🚀 Recent Updates (v1.5.x)
-
-**The "I Don't Trust My Code" Debug System:**
-
-| Key | Feature |
-| :--- | :--- |
-| `F3` | Performance overlay |
-| `F2` | Spider debug menu |
-| `F4` | Hitboxes |
-| `F5` | Grid overlay / Restart |
-| `F6` | Patrol paths / Cycle levels |
-| `F7` | God mode / Teleport |
-| `F12` | Export game state |
+### 🕷️ AI & Mechanics
+*   **Spider AI:** Uses waypoints, vision cones, and sound detection. They react to the player's "crying" state.
+*   **Mystic Snail:** Acts as an emotional support GPS, teleporting to guide the player.
+*   **Hazards:** Sticky floors, water currents, and tripwires add environmental challenges.
 
 ---
 
-## 🎮 For Players
+## 🚀 Quick Start
+Get the game running locally in minutes.
 
-### Installation
-**Easy Mode:** Download JAR → double-click → survive.
+### 📦 Prerequisites
+*   **Java 17** or higher
+*   **Maven** (for building from source)
 
-**From Source:**
+### 🎮 For Players
+1.  Download the latest JAR from Releases.
+2.  Run: `java -jar lullaby-down-below.jar`
+3.  **Survive.**
+
+### ⚙️ For Developers (Build & Run)
 ```bash
-java -jar target/lullaby-down-below-1.5.0-jar-with-dependencies.jar
+# Clone the repository
+git clone https://github.com/yourusername/Lullaby-Down-Below.git
+
+# Navigate to directory
+cd Lullaby-Down-Below
+
+# Install dependencies & Build
+mvn clean install
+
+# Run the game
+mvn exec:java -Dexec.mainClass="com.buglife.main.Game"
 ```
-
-### Controls
-
-| Key | Action |
-| :--- | :--- |
-| **WASD / Arrows** | Move |
-| **Space** | Struggle (when caught) |
-| **E** | Interact |
-| **F** | Throw Item |
-| **Shift** | Dash |
-| **Esc** | Pause |
-
-### 🧩 Gameplay Tips
-* **Hunger = Life.** Eat or you cry. Cry and you die.
-* **Stay in Shadows.** Light is your enemy.
-* **Escape Webs Fast.** Mash `Space` like you mean it.
-* **Follow the Snail.** It knows the way.
 
 ---
 
-## 🛠️ For Developers
+## 🏗️ Architecture
 
-### Stack
-* **Java 17**
-* **Maven**
-* SLF4J + Logback
-* Jackson (JSON parsing)
-* JUnit + Mockito
-
-### Build & Run
-For detailed build instructions and contribution guidelines, please refer to [CONTRIBUTING.md](CONTRIBUTING.md).
-
-### Configuration
-Located in `config.json`:
-```json
-{
-  "game": {
-    "targetFPS": 60,
-    "enableDebug": false
-  }
-}
-```
+### Tech Stack
+*   **Language:** Java 17
+*   **Build:** Maven
+*   **Logging:** SLF4J + Logback
+*   **Data:** Jackson (JSON parsing for levels/config)
+*   **Testing:** JUnit 5 + Mockito
 
 ### Project Structure
 ```text
 src/com/buglife/
- ├─ assets/       # Image loaders
- ├─ config/       # JSON handlers
- ├─ entities/     # Player, Spider, Snail
- ├─ main/         # Game loop & Window
- ├─ states/       # Menu, Play, GameOver
- ├─ ui/           # HUD, Overlay
- └─ world/        # TileMap, Camera
+ ├─ assets/       # Image & Sound loaders
+ ├─ config/       # JSON configuration handlers
+ ├─ engine/       # Core loop, Window, Level Editor
+ ├─ entities/     # Game objects (Player, Spider, Snail)
+ ├─ main/         # Entry point & State Manager
+ ├─ states/       # Game logic states (Playing, Menu)
+ └─ world/        # TileMap, Camera, QuadTree
 ```
 
 ---
 
-## 🧪 Debugging Guide
-If the game crashes:
-1.  Press `F3` → Check FPS.
-2.  Check logs (SLF4J).
-3.  Verify JDK version.
-4.  **If it still fails:** Stare at the wall dramatically. Works 30% of the time.
+## 🎮 Controls
 
-### 📜 Bug Hunter’s Log
-*Legendary battles fought during development:*
-* The Package Curse
-* Infinite Spider Cloning
-* The NaN Teleport Glitch
-* Zombie State Machine
-* The "Escaped Quotes" Disaster
+| Key | Action |
+| :--- | :--- |
+| **WASD / Arrows** | Movement |
+| **Space** | Struggle (when caught in web) |
+| **E** | Interact / Eat |
+| **F** | Throw Distraction |
+| **Shift** | Dash |
+| **Esc** | Pause Menu |
+
+---
+
+## 🗺️ Roadmap
+
+**Phase 1: Foundation (Completed)**
+- [x] Core Engine & Loop
+- [x] Basic AI Implementation
+- [x] Level Loading System
+- [x] Maven Integration
+
+**Phase 2: Polish (Current)**
+- [x] Debug Overlay (v1.5)
+- [ ] Advanced Lighting System
+- [ ] Sound Design Overhaul
+- [ ] Save/Load System
+
+**Phase 3: Expansion**
+- [ ] Level Editor UI
+- [ ] Proc-Gen Levels
+- [ ] Boss Fights
+
+---
+
+## 📜 Bug Hunter's Log
+*Development is messy. Here are some legendary battles we fought:*
+*   **The Infinite Cloning Vat:** 60 spiders spawning per second.
+*   **The NaN Teleport:** Dividing by zero causes interdimensional travel.
+*   **The Zombie State:** Player moving while dead.
+*   **The Escaped Quote:** Shell scripts destroying Java strings.
+
+---
+
+## 🤝 Contributing
+We welcome contributions! Whether you're fixing logic, optimizing the renderer, or designing levels.
+
+*   Look for issues tagged `good first issue`.
+*   Read our [CONTRIBUTING.md](CONTRIBUTING.md) before starting.
 
 ---
 
 ## ✍️ Team
+**Development Team**
+*   **Muhsin** – Lead Developer, Engine Architecture
+*   **Sai** – AI Programming, Behavior Systems
+*   **Rishnu** – Level Design, Maps
+*   **Shibili** – Co-Lead, Debugging Tools
 
-* **Muhsin** – Dev
-* **Sai** – AI Logic 
-* **Rishnu** – Level Design
-* **Shibili** – Debugger
-* **Jenny** – Chaos Consultant & Sarcastic Life Support
-* **Andrea** – Knowledge Oracle
+**Special Thanks**
+*   **Jenny (Gemini)** – Creative Partner & Docs
+*   **Andrea (AI)** – InfoHub & Debugging
 
 ---
 
-**License:** See [LICENSE](LICENSE).
-**Security:** See [SECURITY.md](SECURITY.md).
+## 🌟 Support
+If you enjoyed the code or the scare:
+*   ⭐ **Star this repo**
+*   🐛 **Report bugs**
+*   📢 **Share with friends**
+
+**License:** [MIT](LICENSE) | **Security:** [SECURITY.md](SECURITY.md)
+
+*Do you hear it? The lullaby is calling...*
