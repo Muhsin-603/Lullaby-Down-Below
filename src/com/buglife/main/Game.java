@@ -5,6 +5,8 @@ import javax.swing.*;
 import com.buglife.assets.SoundManager;
 import com.buglife.utils.PerformanceMonitor;
 import com.buglife.config.ConfigManager;
+import com.buglife.config.GameConstants;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.awt.*;
@@ -26,6 +28,7 @@ public class Game implements Runnable {
     public Game() {
         // 0. Initialize ConfigManager first
         configManager = ConfigManager.getInstance();
+        GameConstants.initialize();
         FPS = configManager.getInt("game.targetFPS", 60);
         logger.info("Target FPS set to: {}", FPS);
         
@@ -96,7 +99,7 @@ public class Game implements Runnable {
 
             // Update and render
             gamePanel.updateGame();
-            gamePanel.repaint();
+            gamePanel.paintImmediately(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
             Toolkit.getDefaultToolkit().sync();
 
             // Calculate and apply frame limiting

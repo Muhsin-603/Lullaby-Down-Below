@@ -3,7 +3,7 @@
     "title": "Lullaby Down Below",
     "version": "1.5.0",
     "targetFPS": 60,
-    "enableVSync": false
+    "enableVSync": true
   },
   "display": {
     "virtualWidth": 1366,
@@ -12,9 +12,9 @@
     "windowTitle": "Lullaby Down Below"
   },
   "player": {
-    "normalSpeed": 1.8,
+    "normalSpeed": 3.5,
     "slowSpeed": 0.5,
-    "boostSpeed": 4.0,
+    "boostSpeed": 5.0,
     "maxHunger": 100,
     "hungerDrainInterval": 120,
     "dashSpeed": 8,
