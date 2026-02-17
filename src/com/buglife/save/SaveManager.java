@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.buglife.entities.Food;
 import com.buglife.entities.Player;
 import com.buglife.entities.Toy;
+import com.buglife.utils.TelemetryClient;
 
 /**
  * SaveManager — The Two-Tiered Vault Orchestrator.
@@ -73,6 +74,9 @@ public class SaveManager {
             }
         }
         save.setRemainingFoods(foodStates);
+
+        // IT IS TIME (TRACKING CAREER)
+        save.setTotalPlaytimeSeconds(TelemetryClient.getTotalPlaytimeSeconds());
 
         // META
         save.setPlayerName(UserProfile.getActivePlayer());

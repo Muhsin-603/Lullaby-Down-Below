@@ -38,6 +38,7 @@ public class SaveData {
     private String playerName;       // The arcade identity (e.g. "SHIBILI")
     private long saveTimestamp;      // When this photograph was taken (epoch millis)
     private String saveVersion;      // Schema version for future compatibility
+    private long totalPlaytimeSeconds; // Total time spent in the game (all sessions)
 
     public SaveData() {
         this.remainingFoods = new ArrayList<>();
@@ -113,9 +114,12 @@ public class SaveData {
     public String getSaveVersion() { return saveVersion; }
     public void setSaveVersion(String saveVersion) { this.saveVersion = saveVersion; }
 
+    public long getTotalPlaytimeSeconds() { return totalPlaytimeSeconds; }
+    public void setTotalPlaytimeSeconds(long totalPlaytimeSeconds) { this.totalPlaytimeSeconds = totalPlaytimeSeconds; }
+
     @Override
     public String toString() {
-        return String.format("SaveData{player=%s, level=%s, pos=(%.0f,%.0f), hunger=%d, time=%d}",
-                playerName, levelId, playerX, playerY, hunger, saveTimestamp);
+        return String.format("SaveData{player=%s, level=%s, pos=(%.0f,%.0f), hunger=%d, time=%d, playtime=%d}",
+                playerName, levelId, playerX, playerY, hunger, saveTimestamp, totalPlaytimeSeconds);
     }
 }

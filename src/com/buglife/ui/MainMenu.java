@@ -15,6 +15,7 @@ import com.buglife.main.GamePanel;
 import com.buglife.assets.AssetManager;
 import com.buglife.save.SaveManager;
 import com.buglife.save.UserProfile;
+import com.buglife.utils.TelemetryClient;
 
 
 public class MainMenu {
@@ -25,6 +26,8 @@ public class MainMenu {
     private BufferedImage backgroundImage;
     private BufferedImage titleimg;
     
+    // Stats to draw
+    private String careerPlaytimeStr = "";
 
     public MainMenu() {
         loadBackgroundImage("/res/sprites/ui/main_bg.png"); //image location
@@ -43,6 +46,13 @@ public class MainMenu {
             if (currentSelection == 0) {
                 currentSelection = 1;
             }
+        }
+        
+        // Update stats
+        if (TelemetryClient.isActive()) {
+            careerPlaytimeStr = "CAREER PLAYTIME: " + TelemetryClient.formatPlaytime(TelemetryClient.getTotalPlaytimeSeconds());
+        } else {
+            careerPlaytimeStr = "SESSION NOT STARTED";
         }
     }
     
@@ -112,6 +122,12 @@ public class MainMenu {
         int optionWidth = g.getFontMetrics().stringWidth(options[i]);
         g.drawString(options[i], (GamePanel.VIRTUAL_WIDTH - optionWidth) / 2, 350 + i * 60);
     }
+    
+    // 4. Draw career playtime at bottom
+    g.setFont(optionFont.deriveFont(Font.PLAIN, 20));
+    g.setColor(new Color(255, 255, 255, 180));
+    int statsWidth = g.getFontMetrics().stringWidth(careerPlaytimeStr);
+    g.drawString(careerPlaytimeStr, (GamePanel.VIRTUAL_WIDTH - statsWidth) / 2, GamePanel.VIRTUAL_HEIGHT - 30);
 }
 
     public void moveUp() {

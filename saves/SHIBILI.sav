@@ -1,0 +1,37 @@
+{
+  "levelId" : "level2",
+  "levelIndex" : 1,
+  "playerX" : 296.0,
+  "playerY" : 2744.0,
+  "facingDirection" : "RIGHT",
+  "hunger" : 61,
+  "speedBoostTimer" : 0,
+  "hasToy" : false,
+  "toyX" : 0.0,
+  "toyY" : 0.0,
+  "remainingFoods" : [ {
+    "x" : 282,
+    "y" : 3354,
+    "type" : "BERRY"
+  }, {
+    "x" : 666,
+    "y" : 3482,
+    "type" : "BERRY"
+  }, {
+    "x" : 282,
+    "y" : 1818,
+    "type" : "BERRY"
+  }, {
+    "x" : 538,
+    "y" : 794,
+    "type" : "BERRY"
+  }, {
+    "x" : 1178,
+    "y" : 986,
+    "type" : "BERRY"
+  } ],
+  "playerName" : "SHIBILI",
+  "saveTimestamp" : 1771355278243,
+  "saveVersion" : "1.0",
+  "crying" : false
+}
