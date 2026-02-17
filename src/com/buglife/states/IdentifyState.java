@@ -13,6 +13,8 @@ import com.buglife.main.Game;
 import com.buglife.main.GamePanel;
 import com.buglife.main.GameStateManager;
 import com.buglife.save.CloudSaveManager;
+import com.buglife.save.SaveData;
+import com.buglife.save.SaveManager;
 import com.buglife.save.UserProfile;
 import com.buglife.utils.TelemetryClient;
 
@@ -553,9 +555,13 @@ public class IdentifyState extends GameState {
         // Lock name into the session
         UserProfile.setActivePlayer(uppedName);
 
-        // Re-init TelemetryClient with this player
+        // Fetch their total playtime from the save file
+        SaveData save = SaveManager.loadGame(uppedName);
+        long startingTotalPlaytime = (save != null) ? save.getTotalPlaytimeSeconds() : 0;
+
+        // Re-init TelemetryClient with this player and their career total
         TelemetryClient.shutdown();
-        TelemetryClient.initialize(uppedName);
+        TelemetryClient.initialize(uppedName, startingTotalPlaytime);
 
         // Brief pause to show welcome, then menu
         new Thread(() -> {
@@ -597,9 +603,9 @@ public class IdentifyState extends GameState {
         // Lock name into the session
         UserProfile.setActivePlayer(name);
 
-        // Re-init TelemetryClient
+        // Re-init TelemetryClient (starts at 0 playtime for a fresh soul)
         TelemetryClient.shutdown();
-        TelemetryClient.initialize(name);
+        TelemetryClient.initialize(name, 0);
 
         // Transition
         new Thread(() -> {
