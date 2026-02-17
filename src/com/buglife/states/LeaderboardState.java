@@ -14,6 +14,7 @@ import com.buglife.main.GamePanel;
 import com.buglife.main.GameStateManager;
 import com.buglife.save.CloudSaveManager;
 import com.buglife.save.CloudSaveManager.LeaderboardEntry;
+import com.buglife.utils.TelemetryClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ public class LeaderboardState extends GameState {
 
     // ─── Categories ─────────────────────────────────────────────
     private static final String[] CATEGORIES = {"deaths", "playtime", "levels_completed"};
-    private static final String[] CATEGORY_LABELS = {"DEATHS", "PLAYTIME (s)", "LEVELS CLEARED"};
+    private static final String[] CATEGORY_LABELS = {"DEATHS", "PLAYTIME", "LEVELS CLEARED"};
     private int selectedCategory = 0;
 
     // ─── Visual ─────────────────────────────────────────────────
@@ -264,7 +265,13 @@ public class LeaderboardState extends GameState {
             g.drawString(entry.getPlayerName(), colName, drawY);
 
             // Value
-            String valueStr = String.valueOf(entry.getValue());
+            String valueStr;
+            if (CATEGORIES[selectedCategory].equals("playtime")) {
+                valueStr = TelemetryClient.formatPlaytime(entry.getValue());
+            } else {
+                valueStr = String.valueOf(entry.getValue());
+            }
+
             FontMetrics efm = g.getFontMetrics();
             int valW = efm.stringWidth(valueStr);
             g.drawString(valueStr, colValue - valW + 100, drawY);
