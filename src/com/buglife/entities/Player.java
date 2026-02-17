@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.function.IntBinaryOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
- 
+
 import com.buglife.assets.SoundManager;
 import com.buglife.assets.AssetManager;
 import com.buglife.world.World;
 import com.buglife.config.GameConstants;
 import com.buglife.config.TileConstants;
+import com.buglife.utils.TelemetryClient;
 
 public class Player {
     private static final Logger logger = LoggerFactory.getLogger(Player.class);
@@ -28,7 +29,6 @@ public class Player {
     private int width, height;
     private double currentSpeed; // How fast we are moving RIGHT NOW
     private int speedBoostTimer = 0;
-
 
     private int hunger = GameConstants.Player.MAX_HUNGER;
     private int collisionRadius;
@@ -54,12 +54,17 @@ public class Player {
     private static List<BufferedImage> walkRightFrames;
     private int webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED;
     private int webbedTimer = GameConstants.Player.WEBBED_DEATH_TIMER;
+    private int immunityTimer = 0; // Temporary web immunity after struggle
     private boolean diedFromWeb = false;
 
     public boolean isWebbed() {
-
         return this.currentState == PlayerState.WEBBED;
     }
+
+    public boolean isWebImmune() {
+        return immunityTimer > 0;
+    }
+
     public int getSpeedBoostTimer() {
         return this.speedBoostTimer;
     }
@@ -67,27 +72,33 @@ public class Player {
     public boolean hasDiedFromWeb() {
         return this.diedFromWeb;
     }
-    
+
     /**
      * Get current state as string for debug display
      */
     public String getCurrentState() {
-        if (isDashing) return "DASHING";
-        if (speedBoostTimer > 0) return "SPEED_BOOST";
-        if (currentState == PlayerState.WEBBED) return "WEBBED";
-        if (isCrying()) return "CRYING";
+        if (isDashing)
+            return "DASHING";
+        if (speedBoostTimer > 0)
+            return "SPEED_BOOST";
+        if (currentState == PlayerState.WEBBED)
+            return "WEBBED";
+        if (isCrying())
+            return "CRYING";
         return currentState.name();
     }
-    
+
     /**
      * Get current movement speed
      */
     public double getSpeed() {
-        if (isDashing) return GameConstants.Player.DASH_SPEED;
-        if (speedBoostTimer > 0) return GameConstants.Player.BOOST_SPEED;
+        if (isDashing)
+            return GameConstants.Player.DASH_SPEED;
+        if (speedBoostTimer > 0)
+            return GameConstants.Player.BOOST_SPEED;
         return GameConstants.Player.NORMAL_SPEED;
     }
-    
+
     /**
      * Check if player is holding the toy (for debug display)
      * Note: Toy carrying is tracked in Toy class, this is a placeholder
@@ -115,6 +126,7 @@ public class Player {
             // Apply 5 seconds of speed (60 fps * 5)
             this.speedBoostTimer = 300;
         }
+        TelemetryClient.onItemUsed((float) this.x, (float) this.y, food.getType().name());
     }
     // Add this method anywhere inside your Player class
 
@@ -184,6 +196,7 @@ public class Player {
         // Reset web status completely
         this.webbedTimer = 0;
         this.webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED;
+        this.immunityTimer = 0;
         // this.WEB_ESCAPE_REQUIRED = 4;
 
         // Make sure movement flags are off
@@ -204,8 +217,10 @@ public class Player {
 
     // Add this method to Player.java
     public void getWebbed() {
-        if (currentState != PlayerState.WEBBED) {
+        if (currentState != PlayerState.WEBBED && immunityTimer <= 0) {
             currentState = PlayerState.WEBBED;
+            isDashing = false;
+            dashDuration = 0;
 
             webbedTimer = GameConstants.Player.WEBBED_DEATH_TIMER; // You have 5 seconds to live...
             webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED; // ...and 4 taps to escape. Good luck.
@@ -226,8 +241,8 @@ public class Player {
 
             // Use webbed sprite if in webbed state
             if (currentState == PlayerState.WEBBED && webbedSprite != null) {
-                int drawX = (int)x - (webbedWidth - width) / 2;
-                int drawY = (int)y - (webbedHeight - height) / 2;
+                int drawX = (int) x - (webbedWidth - width) / 2;
+                int drawY = (int) y - (webbedHeight - height) / 2;
                 g2d.drawImage(webbedSprite, drawX, drawY, webbedWidth, webbedHeight, null);
             } else {
                 // ...existing animation rendering code...
@@ -295,8 +310,8 @@ public class Player {
         this.width = drawSize;
         this.height = drawSize;
         this.collisionRadius = collisionSize / 2;
-        this.webbedWidth = (int)(width * 1.2);
-        this.webbedHeight = (int)(height * 1.2);
+        this.webbedWidth = (int) (width * 1.2);
+        this.webbedHeight = (int) (height * 1.2);
         loadAnimations();
     }
     /// res/sprites/player/pla.png"
@@ -379,6 +394,7 @@ public class Player {
                 currentState = PlayerState.IDLE_DOWN;
                 webbedTimer = GameConstants.Player.WEBBED_DEATH_TIMER;
                 webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED;
+                immunityTimer = GameConstants.Player.WEB_IMMUNITY_DURATION; // Grant immunity
             }
         }
     }
@@ -399,6 +415,9 @@ public class Player {
             cryDeathTimer--;
             if (cryDeathTimer <= 0) {
                 this.hunger = 0;
+            }
+            if (cryDeathTimer == 0) {
+                TelemetryClient.onPlayerDeath((float) this.x, (float) this.y, "STARVATION");
             }
         } else {
             hungerDrainTimer++;
@@ -428,27 +447,33 @@ public class Player {
 
         if (speedBoostTimer > 0) {
             this.currentSpeed = GameConstants.Player.BOOST_SPEED; // Use the boost speed
-            speedBoostTimer--;               // Tick down the timer
+            speedBoostTimer--; // Tick down the timer
         } else {
             // Normal logic when not boosted
             int playerTileCol = getCenterX() / World.TILE_SIZE;
             int playerTileRow = getCenterY() / World.TILE_SIZE;
             int tileID = world.getTileIdAt(playerTileCol, playerTileRow);
-            
+
             if (tileID == TileConstants.STICKY_FLOOR) { // Sticky floor
                 this.currentSpeed = GameConstants.Player.SLOW_SPEED;
             } else {
                 this.currentSpeed = GameConstants.Player.NORMAL_SPEED;
             }
         }
-        
+
         int playerTileCol = getCenterX() / World.TILE_SIZE;
         int playerTileRow = getCenterY() / World.TILE_SIZE;
 
         if (world.getTileIdAt(playerTileCol, playerTileRow) == TileConstants.LADDER_3) {
+            if (!this.onLevelCompleteTile) { // Only log it the FIRST frame they step on it
+                TelemetryClient.onLevelComplete((float) this.x, (float) this.y, "Current_Level", 0); // Note: You'll
+                                                                                                     // need to pass the
+                                                                                                     // real timer/level
+                                                                                                     // name later
+            }
             this.onLevelCompleteTile = true;
         } else {
-            this.onLevelCompleteTile = false; // Ensure it's false when not on the tile
+            this.onLevelCompleteTile = false;
         }
         if (dashCooldown > 0) {
             dashCooldown--;
@@ -457,6 +482,11 @@ public class Player {
             dashDuration--;
         } else {
             isDashing = false;
+        }
+
+        // Tick down immunity timer
+        if (immunityTimer > 0) {
+            immunityTimer--;
         }
 
         // If currently dashing, apply dash velocity
@@ -476,15 +506,14 @@ public class Player {
         }
 
         if (currentState == PlayerState.WEBBED) {
-            if (isCrying) {
-                this.hunger = 0;
-            } else {
-                webbedTimer--;
-                if (webbedTimer <= 0) {
-                    this.diedFromWeb = true;
-                }
-                return;
+            webbedTimer--;
+            if (webbedTimer <= 0) {
+                this.diedFromWeb = true;
             }
+
+            // Always drain hunger even when webbed to keep pressure on
+            updateHungerAndCrying(soundManager);
+            return;
         }
         updateHungerAndCrying(soundManager);
 
@@ -598,7 +627,7 @@ public class Player {
      * @return A Rectangle object representing the player's position and size.
      */
     public Rectangle getBounds() {
-        bounds.setLocation((int)x, (int)y); // Update and return the same object
+        bounds.setLocation((int) x, (int) y); // Update and return the same object
         return bounds;
     }
 
