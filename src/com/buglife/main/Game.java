@@ -7,6 +7,8 @@ import com.buglife.utils.PerformanceMonitor;
 import com.buglife.utils.TelemetryClient;
 import com.buglife.config.ConfigManager;
 import com.buglife.config.GameConstants;
+import com.buglife.save.SaveManager;
+import com.buglife.save.UserProfile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +35,11 @@ public class Game implements Runnable {
         FPS = configManager.getInt("game.targetFPS", 60);
         logger.info("Target FPS set to: {}", FPS);
         
-        // 0.5. Initialize Telemetry
-        TelemetryClient.initialize("Player_1");
+        // 0.5. Initialize Telemetry with placeholder (re-initialized after identification)
+        TelemetryClient.initialize("UNIDENTIFIED");
+
+        // 0.6. Ensure saves directory exists
+        UserProfile.ensureSavesDirectory();
 
         // 1. Load assets first
         loadCustomFont();
@@ -131,6 +136,9 @@ public class Game implements Runnable {
 
         // Shutdown telemetry
         TelemetryClient.shutdown();
+
+        // Shutdown save manager (cloud services)
+        SaveManager.shutdown();
 
         try {
             if (gameThread != null && gameThread.isAlive()) {

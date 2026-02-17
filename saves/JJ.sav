@@ -1,0 +1,17 @@
+{
+  "levelId" : "level1",
+  "levelIndex" : 0,
+  "playerX" : 2165.0,
+  "playerY" : 65.0,
+  "facingDirection" : "RIGHT",
+  "hunger" : 96,
+  "speedBoostTimer" : 0,
+  "hasToy" : false,
+  "toyX" : 0.0,
+  "toyY" : 0.0,
+  "remainingFoods" : [ ],
+  "playerName" : "JJ",
+  "saveTimestamp" : 1771348836965,
+  "saveVersion" : "1.0",
+  "crying" : false
+}
