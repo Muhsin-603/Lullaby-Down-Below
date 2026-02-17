@@ -99,6 +99,7 @@ public class World {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue; // Skip empty lines
+                if (line.trim().startsWith("#")) break; // Stop at entity data sections
 
                 List<Integer> row = new ArrayList<>();
                 String[] numbers = line.trim().split("\\s+"); // Split by one or more spaces

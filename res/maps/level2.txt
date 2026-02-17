@@ -67,3 +67,37 @@
 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+# PLAYER_SPAWN
+3294 216
+
+# TOY_SPAWN
+none
+
+# SPIDERS
+rectangle 5 8 10 15 Upper chamber guard
+rectangle 14 20 22 35 Middle section large patrol
+rectangle 2 28 12 40 Left chamber patrol
+rectangle 18 50 23 63 Bottom chamber guard
+
+# SNAILS
+184 1856 true Welcome to the second floor...|The spiders here are more aggressive!
+684 1144 true I sense danger ahead...|Stay alert and move carefully.
+1304 704 true The shadows grow deeper here.|Use them wisely...
+1876 280 true You're almost there...|The next floor awaits...|Be brave, little one!
+
+# FOOD
+berry 4 52 Bottom-left chamber
+berry 10 54 Bottom-center
+berry 8 35 Middle-left
+berry 4 28 Left passage
+berry 8 12 Upper-left
+berry 18 15 Upper-center
+
+# TRIPWIRES
+none
+
+# MECHANICS
+dash false
+toy false
+speedboost false
+tripwires false

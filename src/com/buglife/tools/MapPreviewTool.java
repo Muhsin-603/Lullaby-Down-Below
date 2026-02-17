@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.List;
 
 import com.buglife.config.TileConstants;
+import com.buglife.entities.Food;
 import com.buglife.levels.*;
 
 /**
@@ -748,6 +749,8 @@ public class MapPreviewTool extends JFrame {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
+                // Stop reading tiles when we hit a comment/entity section
+                if (line.trim().startsWith("#")) break;
                 List<Integer> row = new ArrayList<>();
                 String[] numbers = line.trim().split("\\s+");
                 for (String num : numbers) {
@@ -772,12 +775,289 @@ public class MapPreviewTool extends JFrame {
         }
     }
     
+    /**
+     * Load level config by parsing entity data directly from the .txt map file.
+     * Entity sections appear after the tile grid, marked with # headers.
+     * Falls back to hardcoded Java config if no entity data found in file.
+     */
     private void loadLevelConfig(String levelName) {
+        // Try parsing entity data from the .txt file
+        try {
+            Path path = Paths.get("res/maps/" + levelName + ".txt");
+            if (Files.exists(path)) {
+                TxtBackedLevelConfig txtConfig = TxtBackedLevelConfig.parse(path, levelName);
+                if (txtConfig != null && txtConfig.hasEntityData()) {
+                    levelConfig = txtConfig;
+                    System.out.println("[MapPreview] Loaded entity data from: " + levelName + ".txt");
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[MapPreview] Error parsing entity data from txt: " + e.getMessage());
+        }
+        // Fall back to hardcoded Java config
         try {
             levelConfig = LevelConfigFactory.getConfig(levelName);
         } catch (Exception e) {
             levelConfig = null;
             System.err.println("Could not load level config for: " + levelName);
+        }
+    }
+
+    /**
+     * Reads entity data (spiders, snails, food, etc.) from # sections
+     * at the bottom of a .txt map file. This enables live-reload of
+     * entity positions by simply editing and saving the .txt file.
+     *
+     * Supported sections:
+     *   # PLAYER_SPAWN
+     *   pixelX pixelY
+     *
+     *   # TOY_SPAWN
+     *   pixelX pixelY
+     *
+     *   # SPIDERS
+     *   rectangle left top right bottom [description]
+     *   horizontal startX endX y [description]
+     *   vertical x startY endY [description]
+     *   custom x1,y1 x2,y2 x3,y3 ... [description]
+     *
+     *   # SNAILS
+     *   pixelX pixelY interaction(true/false) dialogue line 1|line 2|line 3
+     *
+     *   # FOOD
+     *   berry tileX tileY [description]
+     *   energy_seed tileX tileY [description]
+     *
+     *   # TRIPWIRES
+     *   pixelX pixelY
+     *
+     *   # MECHANICS
+     *   dash true/false
+     *   toy true/false
+     *   speedboost true/false
+     *   tripwires true/false
+     */
+    private static class TxtBackedLevelConfig implements LevelConfig {
+        private String levelName;
+        private Point playerSpawn;
+        private Point toySpawn;
+        private List<SpiderPatrolData> spiders = new ArrayList<>();
+        private List<SnailLocationData> snails = new ArrayList<>();
+        private List<FoodSpawnData> food = new ArrayList<>();
+        private List<Point> tripwires = new ArrayList<>();
+        private MechanicsConfig mechanics = new MechanicsConfig();
+
+        public boolean hasEntityData() {
+            return !spiders.isEmpty() || !snails.isEmpty() || !food.isEmpty()
+                || !tripwires.isEmpty() || playerSpawn != null || toySpawn != null;
+        }
+
+        @Override public String getLevelName() { return levelName; }
+        @Override public Point getPlayerSpawn() { return playerSpawn; }
+        @Override public Point getToySpawn() { return toySpawn; }
+        @Override public MechanicsConfig getMechanicsEnabled() { return mechanics; }
+        @Override public List<SpiderPatrolData> getSpiderPatrols() { return spiders; }
+        @Override public List<SnailLocationData> getSnailLocations() { return snails; }
+        @Override public List<FoodSpawnData> getFoodSpawns() { return food; }
+        @Override public List<Point> getTripWirePositions() { return tripwires; }
+
+        /**
+         * Parse entity sections from a .txt map file.
+         * Returns null if there are no # sections in the file.
+         */
+        public static TxtBackedLevelConfig parse(Path filePath, String levelName) throws IOException {
+            List<String> allLines = Files.readAllLines(filePath);
+            TxtBackedLevelConfig config = new TxtBackedLevelConfig();
+            config.levelName = levelName;
+
+            // Find the first # line (start of entity sections)
+            int sectionStart = -1;
+            for (int i = 0; i < allLines.size(); i++) {
+                if (allLines.get(i).trim().startsWith("#")) {
+                    sectionStart = i;
+                    break;
+                }
+            }
+            if (sectionStart == -1) return null; // No entity sections
+
+            String currentSection = "";
+            for (int i = sectionStart; i < allLines.size(); i++) {
+                String line = allLines.get(i).trim();
+                if (line.isEmpty()) continue;
+
+                // Section header
+                if (line.startsWith("#")) {
+                    currentSection = line.substring(1).trim().toUpperCase();
+                    continue;
+                }
+
+                try {
+                    switch (currentSection) {
+                        case "PLAYER_SPAWN":
+                            parsePlayerSpawn(config, line);
+                            break;
+                        case "TOY_SPAWN":
+                            parseToySpawn(config, line);
+                            break;
+                        case "SPIDERS":
+                            parseSpider(config, line);
+                            break;
+                        case "SNAILS":
+                            parseSnail(config, line);
+                            break;
+                        case "FOOD":
+                            parseFood(config, line);
+                            break;
+                        case "TRIPWIRES":
+                            parseTripwire(config, line);
+                            break;
+                        case "MECHANICS":
+                            parseMechanic(config, line);
+                            break;
+                    }
+                } catch (Exception e) {
+                    System.err.println("[MapPreview] Warning: could not parse line " + (i+1) + ": " + line + " (" + e.getMessage() + ")");
+                }
+            }
+            return config;
+        }
+
+        private static void parsePlayerSpawn(TxtBackedLevelConfig config, String line) {
+            String[] parts = line.split("\\s+");
+            config.playerSpawn = new Point(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+        }
+
+        private static void parseToySpawn(TxtBackedLevelConfig config, String line) {
+            if (line.equalsIgnoreCase("none")) return;
+            String[] parts = line.split("\\s+");
+            config.toySpawn = new Point(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+        }
+
+        private static void parseSpider(TxtBackedLevelConfig config, String line) {
+            String[] parts = line.split("\\s+", 2);
+            String type = parts[0].toLowerCase();
+            String rest = parts.length > 1 ? parts[1] : "";
+            String[] args = rest.split("\\s+");
+
+            SpiderPatrolData patrol = null;
+            String description = null;
+
+            switch (type) {
+                case "rectangle": {
+                    int left = Integer.parseInt(args[0]);
+                    int top = Integer.parseInt(args[1]);
+                    int right = Integer.parseInt(args[2]);
+                    int bottom = Integer.parseInt(args[3]);
+                    patrol = SpiderPatrolData.rectangle(left, top, right, bottom);
+                    if (args.length > 4) {
+                        description = joinFrom(args, 4);
+                    }
+                    break;
+                }
+                case "horizontal": {
+                    int startX = Integer.parseInt(args[0]);
+                    int endX = Integer.parseInt(args[1]);
+                    int y = Integer.parseInt(args[2]);
+                    patrol = SpiderPatrolData.horizontal(startX, endX, y);
+                    if (args.length > 3) {
+                        description = joinFrom(args, 3);
+                    }
+                    break;
+                }
+                case "vertical": {
+                    int x = Integer.parseInt(args[0]);
+                    int startY = Integer.parseInt(args[1]);
+                    int endY = Integer.parseInt(args[2]);
+                    patrol = SpiderPatrolData.vertical(x, startY, endY);
+                    if (args.length > 3) {
+                        description = joinFrom(args, 3);
+                    }
+                    break;
+                }
+                case "custom": {
+                    SpiderPatrolData.CustomBuilder builder = SpiderPatrolData.custom();
+                    int waypointEnd = 0;
+                    for (int j = 0; j < args.length; j++) {
+                        if (args[j].contains(",")) {
+                            String[] xy = args[j].split(",");
+                            builder.addPoint(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
+                            waypointEnd = j + 1;
+                        } else {
+                            break;
+                        }
+                    }
+                    patrol = builder.build();
+                    if (waypointEnd < args.length) {
+                        description = joinFrom(args, waypointEnd);
+                    }
+                    break;
+                }
+            }
+
+            if (patrol != null) {
+                if (description != null) patrol.describe(description);
+                config.spiders.add(patrol);
+            }
+        }
+
+        private static void parseSnail(TxtBackedLevelConfig config, String line) {
+            // Format: pixelX pixelY interaction(true/false) dialogue1|dialogue2|...
+            String[] parts = line.split("\\s+", 4);
+            int px = Integer.parseInt(parts[0]);
+            int py = Integer.parseInt(parts[1]);
+            boolean interaction = Boolean.parseBoolean(parts[2]);
+            SnailLocationData snail = SnailLocationData.at(px, py);
+            if (parts.length > 3) {
+                String[] dialogueLines = parts[3].split("\\|");
+                snail.withDialogue(dialogueLines);
+            }
+            if (interaction) snail.requiresInteraction();
+            else snail.autoAdvance();
+            config.snails.add(snail);
+        }
+
+        private static void parseFood(TxtBackedLevelConfig config, String line) {
+            // Format: type tileX tileY [description]
+            String[] parts = line.split("\\s+", 4);
+            String type = parts[0].toLowerCase();
+            int tx = Integer.parseInt(parts[1]);
+            int ty = Integer.parseInt(parts[2]);
+            FoodSpawnData fd;
+            if (type.equals("energy_seed")) {
+                fd = FoodSpawnData.energySeed(tx, ty);
+            } else {
+                fd = FoodSpawnData.berry(tx, ty);
+            }
+            if (parts.length > 3) fd.describe(parts[3]);
+            config.food.add(fd);
+        }
+
+        private static void parseTripwire(TxtBackedLevelConfig config, String line) {
+            if (line.equalsIgnoreCase("none")) return;
+            String[] parts = line.split("\\s+");
+            config.tripwires.add(new Point(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])));
+        }
+
+        private static void parseMechanic(TxtBackedLevelConfig config, String line) {
+            String[] parts = line.split("\\s+");
+            String key = parts[0].toLowerCase();
+            boolean val = Boolean.parseBoolean(parts[1]);
+            switch (key) {
+                case "dash":      if (val) config.mechanics.enableDash(); break;
+                case "toy":       if (val) config.mechanics.enableToy(); break;
+                case "speedboost": if (val) config.mechanics.enableSpeedBoostFood(); break;
+                case "tripwires": if (val) config.mechanics.enableTripWires(); break;
+            }
+        }
+
+        private static String joinFrom(String[] parts, int startIndex) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = startIndex; i < parts.length; i++) {
+                if (i > startIndex) sb.append(" ");
+                sb.append(parts[i]);
+            }
+            return sb.toString();
         }
     }
     
@@ -822,7 +1102,8 @@ public class MapPreviewTool extends JFrame {
     
     private class FileWatcher extends Thread {
         private volatile boolean running = true;
-        private long lastModified = 0;
+        private long lastModifiedTxt = 0;
+        private long lastModifiedJson = 0;
         
         @Override
         public void run() {
@@ -831,16 +1112,33 @@ public class MapPreviewTool extends JFrame {
                     Thread.sleep(1000);  // Check every second
                     if (!liveReload) continue;
                     
+                    boolean changed = false;
+                    
+                    // Watch .txt map file for tile changes
                     Path mapPath = Paths.get("res/maps/" + currentLevel + ".txt");
                     if (Files.exists(mapPath)) {
                         long mod = Files.getLastModifiedTime(mapPath).toMillis();
-                        if (mod > lastModified && lastModified != 0) {
-                            SwingUtilities.invokeLater(() -> {
-                                reloadCurrentLevel();
-                                updateStatus("Live reloaded: " + currentLevel);
-                            });
+                        if (mod > lastModifiedTxt && lastModifiedTxt != 0) {
+                            changed = true;
                         }
-                        lastModified = mod;
+                        lastModifiedTxt = mod;
+                    }
+                    
+                    // Watch .json file for entity data changes (spiders, snails, food, etc.)
+                    Path jsonPath = Paths.get("res/maps/" + currentLevel + ".json");
+                    if (Files.exists(jsonPath)) {
+                        long mod = Files.getLastModifiedTime(jsonPath).toMillis();
+                        if (mod > lastModifiedJson && lastModifiedJson != 0) {
+                            changed = true;
+                        }
+                        lastModifiedJson = mod;
+                    }
+                    
+                    if (changed) {
+                        SwingUtilities.invokeLater(() -> {
+                            reloadCurrentLevel();
+                            updateStatus("Live reloaded: " + currentLevel);
+                        });
                     }
                 } catch (Exception e) {
                     // Ignore

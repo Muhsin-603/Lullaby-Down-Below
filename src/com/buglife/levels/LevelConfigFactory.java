@@ -12,16 +12,9 @@ package com.buglife.levels;
  */
 public class LevelConfigFactory {
     
-    // Cached instances (singleton per level)
-    private static final Level1Config LEVEL_1 = new Level1Config();
-    private static final Level2Config LEVEL_2 = new Level2Config();
-    private static final Level3Config LEVEL_3 = new Level3Config();
-    private static final Level4Config LEVEL_4 = new Level4Config();
-    private static final Level5Config LEVEL_5 = new Level5Config();
-    private static final LevelTestConfig LEVEL_TEST = new LevelTestConfig();
-    
     /**
      * Get the configuration for a level by name.
+     * Creates a fresh instance each time to support live-reload workflows.
      * 
      * @param levelName The level name (e.g., "level1", "level2", "level_test")
      * @return The LevelConfig for that level, or Level1Config as fallback
@@ -29,27 +22,27 @@ public class LevelConfigFactory {
     public static LevelConfig getConfig(String levelName) {
         switch (levelName) {
             case "level1":
-                return LEVEL_1;
+                return new Level1Config();
                 
             case "level2":
-                return LEVEL_2;
+                return new Level2Config();
                 
             case "level3":
-                return LEVEL_3;
+                return new Level3Config();
                 
             case "level4":
-                return LEVEL_4;
+                return new Level4Config();
                 
             case "level5":
-                return LEVEL_5;
+                return new Level5Config();
                 
             case "level_test":
-                return LEVEL_TEST;
+                return new LevelTestConfig();
                 
             default:
                 // Unknown level - fall back to Level 1
                 System.err.println("[LevelConfigFactory] Unknown level: " + levelName + ", using Level1Config");
-                return LEVEL_1;
+                return new Level1Config();
         }
     }
     

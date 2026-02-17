@@ -42,3 +42,37 @@
 1 0 0 0 0 0 0 0 41 42 43 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
 1 0 0 0 0 0 0 0 44 45 46 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+# PLAYER_SPAWN
+594 2484
+
+# TOY_SPAWN
+574 2256
+
+# SPIDERS
+rectangle 23 23 29 25 Bottom-right patrol
+rectangle 2 2 8 7 Top-left patrol
+vertical 26 1 10 Right wall vertical
+rectangle 7 10 15 15 Middle patrol
+
+# SNAILS
+534 2464 true Hello little one...|Be careful of the spiders!
+938 1754 true You shouldn't stay hungry|Eat these berries.|These give you energy
+1116 976 true There are dark shadows.|You can hide from the spiders in it
+2166 136 true Stay safe|Climb these ladders to the next floor.|Farewell little one...!
+
+# FOOD
+berry 16 27 Near start
+berry 34 25 Right side
+berry 5 5 Top-left
+energy_seed 22 10 Strategic boost location 1
+energy_seed 15 15 Strategic boost location 2
+
+# TRIPWIRES
+1718 1770
+800 2400
+
+# MECHANICS
+dash true
+toy true
+speedboost true
+tripwires true

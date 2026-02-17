@@ -42,3 +42,34 @@
 1 0 0 0 0 0 0 0 41 42 43 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
 1 0 0 0 0 0 0 0 44 45 46 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+# PLAYER_SPAWN
+594 2484
+
+# TOY_SPAWN
+none
+
+# SPIDERS
+rectangle 23 23 29 25 Guards the bottom-right chamber
+rectangle 2 2 8 7 Patrols top-left spawn area
+vertical 26 1 10 Vertical guard on right wall
+rectangle 7 10 15 15 Middle chamber patrol
+
+# SNAILS
+534 2464 true Hello little one...|Be careful of the spiders!
+938 1754 true You shouldn't stay hungry|Eat these berries.|These give you energy
+1116 976 true There are dark shadows.|You can hide from the spiders in it
+2166 136 true Stay safe|Climb these ladders to the next floor.|Farewell little one...!
+
+# FOOD
+berry 16 27 Near starting area
+berry 34 25 Right side chamber
+berry 5 5 Top-left corner
+
+# TRIPWIRES
+none
+
+# MECHANICS
+dash false
+toy false
+speedboost false
+tripwires false
