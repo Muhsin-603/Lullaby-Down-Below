@@ -85,6 +85,7 @@ public final class GameConstants {
         public static final int CRY_DEATH_DURATION = 20 * 60;
         public static final int WEB_ESCAPE_REQUIRED = 4;
         public static final int WEBBED_DEATH_TIMER = 300;
+        public static final int WEB_IMMUNITY_DURATION = 90; // Added 1.5s of immunity after struggle
         public static final int ANIMATION_SPEED = 3;
         public static final int DRAW_SIZE = 32;
         public static final int COLLISION_SIZE = 32;
