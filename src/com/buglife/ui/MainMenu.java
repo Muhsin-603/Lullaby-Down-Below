@@ -13,12 +13,15 @@ import org.slf4j.LoggerFactory;
 import com.buglife.main.Game;
 import com.buglife.main.GamePanel;
 import com.buglife.assets.AssetManager;
+import com.buglife.save.SaveManager;
+import com.buglife.save.UserProfile;
 
 
 public class MainMenu {
     private static final Logger logger = LoggerFactory.getLogger(MainMenu.class);
-    public String[] options = {"New Game", "Test Level", "Settings", "Quit"};
+    public String[] options = {"Continue", "New Game", "Test Level", "Leaderboard", "Settings", "Quit"};
     public int currentSelection = 0;
+    private boolean hasSaveFile = false;
     private BufferedImage backgroundImage;
     private BufferedImage titleimg;
     
@@ -26,6 +29,21 @@ public class MainMenu {
     public MainMenu() {
         loadBackgroundImage("/res/sprites/ui/main_bg.png"); //image location
         loadTitle("/res/sprites/ui/logo.png");
+        refreshSaveStatus();
+    }
+
+    /**
+     * Check if the current player has a save file and update menu accordingly.
+     */
+    public void refreshSaveStatus() {
+        String player = UserProfile.getActivePlayer();
+        hasSaveFile = player != null && SaveManager.hasSave(player);
+        if (!hasSaveFile) {
+            // If no save exists, skip "Continue" — start selection at "New Game"
+            if (currentSelection == 0) {
+                currentSelection = 1;
+            }
+        }
     }
     
     private void loadTitle(String path) {
@@ -81,6 +99,11 @@ public class MainMenu {
    // 3. Draw Menu Options using the selected font
     g.setFont(optionFont);
     for (int i = 0; i < options.length; i++) {
+        // Skip "Continue" option if no save file exists
+        if (options[i].equals("Continue") && !hasSaveFile) {
+            continue;
+        }
+
         if (i == currentSelection) {
             g.setColor(Color.YELLOW); // Highlight selected
         } else {
@@ -92,16 +115,20 @@ public class MainMenu {
 }
 
     public void moveUp() {
-        currentSelection--;
-        if (currentSelection < 0) {
-            currentSelection = options.length - 1;
-        }
+        do {
+            currentSelection--;
+            if (currentSelection < 0) {
+                currentSelection = options.length - 1;
+            }
+        } while (options[currentSelection].equals("Continue") && !hasSaveFile);
     }
 
     public void moveDown() {
-        currentSelection++;
-        if (currentSelection >= options.length) {
-            currentSelection = 0;
-        }
+        do {
+            currentSelection++;
+            if (currentSelection >= options.length) {
+                currentSelection = 0;
+            }
+        } while (options[currentSelection].equals("Continue") && !hasSaveFile);
     }
 }

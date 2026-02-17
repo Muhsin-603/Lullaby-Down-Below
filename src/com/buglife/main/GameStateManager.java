@@ -3,6 +3,8 @@ package com.buglife.main;
 import java.awt.Graphics2D;
 import com.buglife.assets.SoundManager;
 import com.buglife.states.GameState;
+import com.buglife.states.IdentifyState;
+import com.buglife.states.LeaderboardState;
 import com.buglife.states.MenuState;
 import com.buglife.states.PlayingState;
 import com.buglife.states.SettingsState;
@@ -21,6 +23,8 @@ public class GameStateManager {
     public static final int GAME_OVER = 3;
     public static final int LEVEL_COMPLETE = 4;
     public static final int SETTINGS = 5;
+    public static final int IDENTIFY = 6;
+    public static final int LEADERBOARD = 7;
 
     private GameState currentState;
     private int nextStateID = -1;
@@ -28,18 +32,21 @@ public class GameStateManager {
     private GamePanel gamePanel; // Reference to parent panel for context
 
     // Cache states to avoid repeated instantiation
+    private IdentifyState identifyState;
     private MenuState menuState;
     private PlayingState playingState;
 
     private GameOverState gameOverState;
     private SettingsState settingsState;
     private LevelCompleteState levelCompleteState;
+    private LeaderboardState leaderboardState;
 
     public GameStateManager(SoundManager soundManager, GamePanel gamePanel) {
         this.soundManager = soundManager;
         this.gamePanel = gamePanel;
 
         // Pre-create states
+        this.identifyState = new IdentifyState(this, soundManager);
         this.menuState = new MenuState(this, soundManager);
         this.playingState = new PlayingState(this, soundManager);
 
@@ -47,9 +54,10 @@ public class GameStateManager {
         this.gameOverState = new GameOverState(this, soundManager);
         this.settingsState = new SettingsState(this, soundManager);
         this.levelCompleteState = new LevelCompleteState(this, soundManager);
+        this.leaderboardState = new LeaderboardState(this, soundManager);
 
-        // Start with menu state
-        setState(MENU);
+        // Start with identify screen (the gatekeeper)
+        setState(IDENTIFY);
     }
 
     public PlayingState getPlayingState() {
@@ -89,6 +97,12 @@ public class GameStateManager {
                 break;
             case SETTINGS:
                 currentState = settingsState;
+                break;
+            case IDENTIFY:
+                currentState = identifyState;
+                break;
+            case LEADERBOARD:
+                currentState = leaderboardState;
                 break;
             default:
                 logger.error("Unknown state ID: {}", nextStateID);

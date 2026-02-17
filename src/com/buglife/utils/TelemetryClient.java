@@ -31,8 +31,8 @@ public class TelemetryClient {
     
     public static void initialize(String playerId) {
         if (initialized) {
-            logger.info("[Telemetry] Already initialized");
-            return;
+            logger.info("[Telemetry] Already initialized, re-initializing with new player: {}", playerId);
+            shutdown();
         }
         
         userId = playerId;
@@ -152,6 +152,10 @@ public class TelemetryClient {
         }
     }
     
+    public static String getUserId() {
+        return userId;
+    }
+
     public static String getSessionId() {
         return sessionId;
     }

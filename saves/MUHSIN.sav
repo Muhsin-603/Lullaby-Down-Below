@@ -1,0 +1,21 @@
+{
+  "levelId" : "level1",
+  "levelIndex" : 0,
+  "playerX" : 2196.0,
+  "playerY" : 1535.0,
+  "facingDirection" : "UP",
+  "hunger" : 100,
+  "speedBoostTimer" : 0,
+  "hasToy" : false,
+  "toyX" : 0.0,
+  "toyY" : 0.0,
+  "remainingFoods" : [ {
+    "x" : 346,
+    "y" : 346,
+    "type" : "BERRY"
+  } ],
+  "playerName" : "MUHSIN",
+  "saveTimestamp" : 1771348112959,
+  "saveVersion" : "1.0",
+  "crying" : false
+}

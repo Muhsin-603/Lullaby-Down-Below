@@ -8,7 +8,11 @@ import com.buglife.main.GamePanel;
 import com.buglife.main.GameStateManager;
 import com.buglife.assets.SoundManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class LevelCompleteState extends GameState {
+    private static final Logger logger = LoggerFactory.getLogger(LevelCompleteState.class);
     private SoundManager soundManager;
     private static final Font BIG_FONT = new Font("Consolas", Font.BOLD, 80);
     private static final Font SMALL_FONT = new Font("Consolas", Font.PLAIN, 24);
@@ -25,8 +29,18 @@ public class LevelCompleteState extends GameState {
         soundManager.stopAllSounds();
         soundManager.playSound("level_complete");
         
-        // Check if this is the last level
+        // === THE AUTO-SAVE (Invisible) ===
+        // The exact moment the player steps on a ladder to complete a level,
+        // the game automatically freezes the state and saves it.
         PlayingState playingState = manager.getPlayingState();
+        if (playingState != null && playingState.isInitialized()) {
+            boolean saved = playingState.saveCurrentState();
+            if (saved) {
+                logger.info("Auto-save triggered on level complete: {}", playingState.getCurrentLevel());
+            }
+        }
+        
+        // Check if this is the last level
         if (playingState.isLastLevel()) {
             options = new String[]{"Main Menu"};
         } else {

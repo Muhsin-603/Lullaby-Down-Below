@@ -17,6 +17,8 @@ import com.buglife.entities.Snail;
 import com.buglife.utils.PerformanceMonitor;
 import com.buglife.utils.DebugExporter;
 import com.buglife.utils.TelemetryClient;
+import com.buglife.save.SaveData;
+import com.buglife.save.SaveManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.buglife.entities.Spider;
@@ -792,6 +794,10 @@ public class PlayingState extends GameState {
             } else if (pauseOptions[pauseMenuSelection].equals("Restart")) {
                 init();
             } else if (pauseOptions[pauseMenuSelection].equals("Quit to Menu")) {
+                // === THE RAGE QUIT SAVE ===
+                // Emergency save of exact coordinates before quitting
+                saveCurrentState();
+                logger.info("Rage quit save completed");
                 manager.setState(GameStateManager.MENU);
             }
         }
@@ -821,6 +827,100 @@ public class PlayingState extends GameState {
 
     public boolean isInitialized() {
         return hasBeenInitialized;
+    }
+
+    /**
+     * Get the current level index for save data.
+     */
+    public int getCurrentLevelIndex() {
+        return currentLevelIndex;
+    }
+
+    /**
+     * Get the remaining foods list for save data.
+     */
+    public List<Food> getFoods() {
+        return foods;
+    }
+
+    /**
+     * Get the toy entity for save data.
+     */
+    public Toy getToy() {
+        return toy;
+    }
+
+    /**
+     * Get the player entity for save data.
+     */
+    public Player getPlayer() {
+        return player;
+    }
+
+    /**
+     * Save the current game state — The Checkpoint Ritual.
+     * Called on: level complete auto-save, rage quit, manual save.
+     * 
+     * @return true if save succeeded
+     */
+    public boolean saveCurrentState() {
+        if (player == null || !hasBeenInitialized) {
+            logger.warn("Cannot save: game not initialized");
+            return false;
+        }
+        return SaveManager.saveGame(player, currentLevel, currentLevelIndex, foods, toy);
+    }
+
+    /**
+     * Load a game from a SaveData snapshot — Resurrect a frozen moment.
+     * Restores player position, hunger, inventory, and world state.
+     */
+    public void loadFromSave(SaveData saveData) {
+        if (saveData == null) {
+            logger.error("Cannot load: SaveData is null");
+            return;
+        }
+
+        // Set level from save
+        this.currentLevel = saveData.getLevelId();
+        this.currentLevelIndex = saveData.getLevelIndex();
+        this.hasBeenInitialized = false;
+
+        // Initialize the level normally first
+        init();
+
+        // Now override with saved state
+        if (player != null) {
+            // Restore position
+            player.setPosition(saveData.getPlayerX(), saveData.getPlayerY());
+
+            // Restore hunger
+            player.setHunger(saveData.getHunger());
+
+            // Restore speed boost
+            player.setSpeedBoostTimer(saveData.getSpeedBoostTimer());
+        }
+
+        // Restore food state (remove foods that were already eaten)
+        if (saveData.getRemainingFoods() != null && foods != null) {
+            List<SaveData.FoodState> savedFoods = saveData.getRemainingFoods();
+            // Only keep foods that exist in the save
+            foods.removeIf(food -> {
+                boolean found = false;
+                for (SaveData.FoodState sf : savedFoods) {
+                    if (Math.abs(food.getCenterX() - sf.getX()) < 5 &&
+                        Math.abs(food.getCenterY() - sf.getY()) < 5) {
+                        found = true;
+                        break;
+                    }
+                }
+                return !found;
+            });
+        }
+
+        logger.info("Game loaded from save: Level={}, Pos=({},{}), Hunger={}",
+                saveData.getLevelId(), (int)saveData.getPlayerX(),
+                (int)saveData.getPlayerY(), saveData.getHunger());
     }
 
     public void pauseGame() {

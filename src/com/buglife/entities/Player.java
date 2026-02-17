@@ -622,6 +622,32 @@ public class Player {
     }
 
     /**
+     * Set the player's position (used when loading from save).
+     */
+    public void setPosition(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
+     * Set the player's hunger level (used when loading from save).
+     */
+    public void setHunger(int hunger) {
+        this.hunger = Math.max(0, Math.min(hunger, GameConstants.Player.MAX_HUNGER));
+        // Reset crying state based on hunger
+        if (this.hunger > 0) {
+            this.isCrying = false;
+        }
+    }
+
+    /**
+     * Set the speed boost timer (used when loading from save).
+     */
+    public void setSpeedBoostTimer(int timer) {
+        this.speedBoostTimer = Math.max(0, timer);
+    }
+
+    /**
      * Returns the player's collision bounds. Super useful later!
      * 
      * @return A Rectangle object representing the player's position and size.
