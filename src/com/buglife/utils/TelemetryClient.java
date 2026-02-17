@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public class TelemetryClient {
     private static final Logger logger = LoggerFactory.getLogger(TelemetryClient.class);
 
-    private static final String OVERSEER_HOST = "http://localhost:8080";
+    private static final String OVERSEER_HOST = "http://127.0.0.1:8090";
     private static final int TIMEOUT_MS = 2000;
     
     public static final String EVENT_STEALTH_BROKEN = "STEALTH_BROKEN";
@@ -63,6 +63,8 @@ public class TelemetryClient {
         initialized = false;
         logger.info("[Telemetry] Session ended");
     }
+
+    
     
     public static void onStealthBroken(float x, float y, String enemyType) {
         sendEvent(EVENT_STEALTH_BROKEN, x, y, 
@@ -100,15 +102,15 @@ public class TelemetryClient {
     }
     
     private static void sendEvent(String eventType, float x, float y, String metaJson) {
-        if (!initialized) {
-            return;
-        }
+        if (!initialized) return;
         
-        String payload = String.format(
+        // CRITICAL: java.util.Locale.US forces decimals instead of commas!
+        String payload = String.format(java.util.Locale.US,
             "{\"session_id\":\"%s\",\"event_type\":\"%s\",\"x\":%.2f,\"y\":%.2f,\"meta\":%s}",
             sessionId, eventType, x, y, metaJson
         );
         
+        System.out.println("[TELEMETRY DEBUG] Packaging Event: " + eventType);
         sendAsync("/event", payload);
     }
     
@@ -121,6 +123,8 @@ public class TelemetryClient {
     private static void sendSync(String endpoint, String jsonPayload) {
         HttpURLConnection conn = null;
         try {
+            System.out.println("\n[TELEMETRY DEBUG] Attempting to contact Overseer at: " + OVERSEER_HOST + endpoint);
+            
             URL url = new URL(OVERSEER_HOST + endpoint);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
@@ -135,15 +139,16 @@ public class TelemetryClient {
             }
 
             int responseCode = conn.getResponseCode();
-            if (responseCode != 200) {
-                logger.debug("[Telemetry] Server returned: {}", responseCode);
-            }
+            System.out.println("[TELEMETRY DEBUG] Server responded with code: " + responseCode);
+            
         } catch (Exception e) {
-            logger.debug("[Telemetry] Connection failed: {}", e.getMessage());
+            System.err.println("\n=========================================");
+            System.err.println("[FATAL TELEMETRY ERROR] Network connection failed!");
+            System.err.println("Exact Reason: " + e.getMessage());
+            e.printStackTrace(); 
+            System.err.println("=========================================\n");
         } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
+            if (conn != null) conn.disconnect();
         }
     }
     
