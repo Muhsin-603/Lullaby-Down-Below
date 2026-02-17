@@ -712,13 +712,17 @@ public class MapPreviewTool extends JFrame {
     
     // ========== LEVEL LOADING ==========
     private void loadLevel(String levelName) {
+        boolean isLevelSwitch = !levelName.equals(this.currentLevel);
         this.currentLevel = levelName;
         loadMapFromFile(levelName);
         loadLevelConfig(levelName);
-        panX = 0;
-        panY = 0;
-        measureStart = null;
-        measureEnd = null;
+        // Only reset pan/zoom on level switch, NOT on live-reload
+        if (isLevelSwitch) {
+            panX = 0;
+            panY = 0;
+            measureStart = null;
+            measureEnd = null;
+        }
         canvas.repaint();
         updateStatus("Loaded: " + levelName + " (" + mapWidth + "x" + mapHeight + " tiles)");
         
@@ -733,16 +737,18 @@ public class MapPreviewTool extends JFrame {
         List<List<Integer>> mapRows = new ArrayList<>();
         
         try {
-            InputStream is = getClass().getResourceAsStream(filePath);
+            InputStream is = null;
+            // Prefer filesystem for live-reload (classpath copy is stale after edits)
+            Path path = Paths.get("res/maps/" + levelName + ".txt");
+            if (Files.exists(path)) {
+                is = new FileInputStream(path.toFile());
+            } else {
+                // Fall back to classpath for packaged/JAR mode
+                is = getClass().getResourceAsStream(filePath);
+            }
             if (is == null) {
-                // Try loading from file system for live reload
-                Path path = Paths.get("res/maps/" + levelName + ".txt");
-                if (Files.exists(path)) {
-                    is = new FileInputStream(path.toFile());
-                } else {
-                    updateStatus("ERROR: Map file not found: " + levelName);
-                    return;
-                }
+                updateStatus("ERROR: Map file not found: " + levelName);
+                return;
             }
             
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -1103,7 +1109,7 @@ public class MapPreviewTool extends JFrame {
     private class FileWatcher extends Thread {
         private volatile boolean running = true;
         private long lastModifiedTxt = 0;
-        private long lastModifiedJson = 0;
+        private String watchedLevel = "";
         
         @Override
         public void run() {
@@ -1112,9 +1118,15 @@ public class MapPreviewTool extends JFrame {
                     Thread.sleep(1000);  // Check every second
                     if (!liveReload) continue;
                     
+                    // Reset timestamp when level changes
+                    if (!currentLevel.equals(watchedLevel)) {
+                        lastModifiedTxt = 0;
+                        watchedLevel = currentLevel;
+                    }
+                    
                     boolean changed = false;
                     
-                    // Watch .txt map file for tile changes
+                    // Watch .txt map file for tile + entity changes
                     Path mapPath = Paths.get("res/maps/" + currentLevel + ".txt");
                     if (Files.exists(mapPath)) {
                         long mod = Files.getLastModifiedTime(mapPath).toMillis();
@@ -1122,16 +1134,6 @@ public class MapPreviewTool extends JFrame {
                             changed = true;
                         }
                         lastModifiedTxt = mod;
-                    }
-                    
-                    // Watch .json file for entity data changes (spiders, snails, food, etc.)
-                    Path jsonPath = Paths.get("res/maps/" + currentLevel + ".json");
-                    if (Files.exists(jsonPath)) {
-                        long mod = Files.getLastModifiedTime(jsonPath).toMillis();
-                        if (mod > lastModifiedJson && lastModifiedJson != 0) {
-                            changed = true;
-                        }
-                        lastModifiedJson = mod;
                     }
                     
                     if (changed) {
