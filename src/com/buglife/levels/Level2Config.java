@@ -33,7 +33,6 @@ public class Level2Config implements LevelConfig {
     
     @Override
     public Point getPlayerSpawn() {
-        // TODO: Adjust this to Level 2 map's starting position
         // Currently using a placeholder near bottom of map
         return new Point(3294, 216);
     }
