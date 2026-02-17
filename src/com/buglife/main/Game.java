@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import com.buglife.assets.SoundManager;
 import com.buglife.utils.PerformanceMonitor;
+import com.buglife.utils.TelemetryClient;
 import com.buglife.config.ConfigManager;
 import com.buglife.config.GameConstants;
 
@@ -32,6 +33,9 @@ public class Game implements Runnable {
         FPS = configManager.getInt("game.targetFPS", 60);
         logger.info("Target FPS set to: {}", FPS);
         
+        // 0.5. Initialize Telemetry
+        TelemetryClient.initialize("Player_1");
+
         // 1. Load assets first
         loadCustomFont();
         soundManager = new SoundManager();
@@ -122,9 +126,11 @@ public class Game implements Runnable {
     /**
      * The main entry point for our application.
      */
-    // In Game.java
     public void cleanup() {
         running = false;
+
+        // Shutdown telemetry
+        TelemetryClient.shutdown();
 
         try {
             if (gameThread != null && gameThread.isAlive()) {
