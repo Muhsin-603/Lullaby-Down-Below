@@ -147,8 +147,8 @@ public class Spider {
 
     // Method to force the spider into chase mode when alerted
     public void startChasing(Player targetPlayer, SoundManager soundManager) {
-        if (currentState == SpiderState.PATROLLING || currentState == SpiderState.RETURNING) { // Only switch if
-                                                                                               // currently patrolling
+        if ((currentState == SpiderState.PATROLLING || currentState == SpiderState.RETURNING)
+                && !targetPlayer.isWebbed()) { // Only switch if not webbed
             this.targetPlayer = targetPlayer; // Make sure it knows who to chase
             this.returnPoint = new Point(getCenterX(), getCenterY()); // Set return point
             this.currentState = SpiderState.CHASING;
@@ -373,7 +373,10 @@ public class Spider {
                     // If not, take the shortest path back.
                     returnToPost();
                 }
-                if (canSeePlayer(targetPlayer, world)) {
+                
+                // Only start chasing again if the player is NOT webbed. 
+                // Don't disturb a spider that's already webbed its prey and is returning.
+                if (canSeePlayer(targetPlayer, world) && !targetPlayer.isWebbed()) {
                     currentState = SpiderState.CHASING;
                     soundManager.stopSound("music");
                     soundManager.playSound("chasing"); // Play sound when seeing player while returning

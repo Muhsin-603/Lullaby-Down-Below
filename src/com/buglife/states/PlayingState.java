@@ -319,12 +319,15 @@ public class PlayingState extends GameState {
 
                     if (currentSpider.isChasing()) {
                         if (player.isCrying()) {
+                            TelemetryClient.onPlayerDeath(player.getX(), player.getY(), "Exhaustion - Caught while Crying");
+                            logger.info("Game Over: Player caught by spider while crying");
                             soundManager.stopSound("music");
                             soundManager.stopSound("chasing");
                             soundManager.playSound("gameOver");
                             manager.setState(GameStateManager.GAME_OVER);
                             return;
-                        } else {
+                        } else if (!player.isWebImmune() && !player.isWebbed()) {
+                            // Only web if not already webbed and not in the "struggle escape" window
                             player.getWebbed();
                             soundManager.playSound("webbed");
                         }

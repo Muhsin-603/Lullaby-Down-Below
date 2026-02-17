@@ -54,11 +54,15 @@ public class Player {
     private static List<BufferedImage> walkRightFrames;
     private int webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED;
     private int webbedTimer = GameConstants.Player.WEBBED_DEATH_TIMER;
+    private int immunityTimer = 0; // Temporary web immunity after struggle
     private boolean diedFromWeb = false;
 
     public boolean isWebbed() {
-
         return this.currentState == PlayerState.WEBBED;
+    }
+
+    public boolean isWebImmune() {
+        return immunityTimer > 0;
     }
 
     public int getSpeedBoostTimer() {
@@ -192,6 +196,7 @@ public class Player {
         // Reset web status completely
         this.webbedTimer = 0;
         this.webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED;
+        this.immunityTimer = 0;
         // this.WEB_ESCAPE_REQUIRED = 4;
 
         // Make sure movement flags are off
@@ -212,8 +217,10 @@ public class Player {
 
     // Add this method to Player.java
     public void getWebbed() {
-        if (currentState != PlayerState.WEBBED) {
+        if (currentState != PlayerState.WEBBED && immunityTimer <= 0) {
             currentState = PlayerState.WEBBED;
+            isDashing = false;
+            dashDuration = 0;
 
             webbedTimer = GameConstants.Player.WEBBED_DEATH_TIMER; // You have 5 seconds to live...
             webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED; // ...and 4 taps to escape. Good luck.
@@ -387,6 +394,7 @@ public class Player {
                 currentState = PlayerState.IDLE_DOWN;
                 webbedTimer = GameConstants.Player.WEBBED_DEATH_TIMER;
                 webStrength = GameConstants.Player.WEB_ESCAPE_REQUIRED;
+                immunityTimer = GameConstants.Player.WEB_IMMUNITY_DURATION; // Grant immunity
             }
         }
     }
@@ -476,6 +484,11 @@ public class Player {
             isDashing = false;
         }
 
+        // Tick down immunity timer
+        if (immunityTimer > 0) {
+            immunityTimer--;
+        }
+
         // If currently dashing, apply dash velocity
         if (isDashing) {
             x += dashVelX;
@@ -493,18 +506,14 @@ public class Player {
         }
 
         if (currentState == PlayerState.WEBBED) {
-            if (isCrying) {
-                this.hunger = 0;
-            } else {
-                webbedTimer--;
-                if (webbedTimer <= 0) {
-                    this.diedFromWeb = true;
-                }
-                if (webbedTimer == 0) {
-                    TelemetryClient.onPlayerDeath((float) this.x, (float) this.y, "WEBBED_BY_SPIDER");
-                }
-                return;
+            webbedTimer--;
+            if (webbedTimer <= 0) {
+                this.diedFromWeb = true;
             }
+
+            // Always drain hunger even when webbed to keep pressure on
+            updateHungerAndCrying(soundManager);
+            return;
         }
         updateHungerAndCrying(soundManager);
 
