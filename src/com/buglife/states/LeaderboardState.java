@@ -14,7 +14,6 @@ import com.buglife.main.GamePanel;
 import com.buglife.main.GameStateManager;
 import com.buglife.save.CloudSaveManager;
 import com.buglife.save.CloudSaveManager.LeaderboardEntry;
-import com.buglife.utils.TelemetryClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -267,7 +266,7 @@ public class LeaderboardState extends GameState {
             // Value
             String valueStr;
             if (CATEGORIES[selectedCategory].equals("playtime")) {
-                valueStr = TelemetryClient.formatPlaytime(entry.getValue());
+                valueStr = formatPlaytime(entry.getValue());
             } else {
                 valueStr = String.valueOf(entry.getValue());
             }
@@ -313,5 +312,22 @@ public class LeaderboardState extends GameState {
     @Override
     public void cleanup() {
         // Nothing to clean up
+    }
+
+    /**
+     * Format playtime into human-readable string (e.g. "1h 23m 45s")
+     */
+    private static String formatPlaytime(long totalSeconds) {
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        if (hours > 0) {
+            return String.format("%dh %dm %ds", hours, minutes, seconds);
+        } else if (minutes > 0) {
+            return String.format("%dm %ds", minutes, seconds);
+        } else {
+            return String.format("%ds", seconds);
+        }
     }
 }

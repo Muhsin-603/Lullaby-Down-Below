@@ -4,7 +4,6 @@ import javax.swing.*;
 
 import com.buglife.assets.SoundManager;
 import com.buglife.utils.PerformanceMonitor;
-import com.buglife.utils.TelemetryClient;
 import com.buglife.config.ConfigManager;
 import com.buglife.config.GameConstants;
 import com.buglife.save.SaveManager;
@@ -35,10 +34,7 @@ public class Game implements Runnable {
         FPS = configManager.getInt("game.targetFPS", 60);
         logger.info("Target FPS set to: {}", FPS);
         
-        // 0.5. Initialize Telemetry with placeholder (re-initialized after identification)
-        TelemetryClient.initialize("UNIDENTIFIED");
-
-        // 0.6. Ensure saves directory exists
+        // 0.5. Ensure saves directory exists
         UserProfile.ensureSavesDirectory();
 
         // 1. Load assets first
@@ -133,9 +129,6 @@ public class Game implements Runnable {
      */
     public void cleanup() {
         running = false;
-
-        // Shutdown telemetry
-        TelemetryClient.shutdown();
 
         // Shutdown save manager (cloud services)
         SaveManager.shutdown();
