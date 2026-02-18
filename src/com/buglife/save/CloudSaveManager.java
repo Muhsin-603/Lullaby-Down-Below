@@ -309,7 +309,7 @@ public class CloudSaveManager {
         }
     }
 
-    // ─── HTTP Plumbing (same pattern as TelemetryClient) ────────
+    // ─── HTTP Plumbing ────────────────────────────────────────────
 
     /**
      * Send a GET request to the Overseer (for user list, leaderboard).

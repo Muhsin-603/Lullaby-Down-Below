@@ -10,6 +10,9 @@ echo   - Level Editor
 echo   - Map Preview Tool
 echo   - Debug Exporter
 echo   - Performance Monitor
+echo   - Telemetry System
+echo   - Test Level
+echo   - Levels beyond Level 2
 echo.
 
 mvn clean package -Prelease -DskipTests
@@ -27,6 +30,13 @@ if %ERRORLEVEL% equ 0 (
     if exist run-map-preview.bat del run-map-preview.bat
     if exist build-dev.bat del build-dev.bat
     echo Dev tool scripts removed.
+    echo.
+
+    echo Copying save files for distribution...
+    if not exist target\saves mkdir target\saves
+    if exist saves\*.sav copy saves\*.sav target\saves\ >nul
+    if exist saves\.profiles.json copy saves\.profiles.json target\saves\ >nul
+    echo Save files copied to target\saves.
     echo.
 
     echo This JAR is ready for distribution to players.

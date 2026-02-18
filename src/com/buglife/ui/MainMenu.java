@@ -15,12 +15,11 @@ import com.buglife.main.GamePanel;
 import com.buglife.assets.AssetManager;
 import com.buglife.save.SaveManager;
 import com.buglife.save.UserProfile;
-import com.buglife.utils.TelemetryClient;
 
 
 public class MainMenu {
     private static final Logger logger = LoggerFactory.getLogger(MainMenu.class);
-    public String[] options = {"Continue", "New Game", "Test Level", "Leaderboard", "Settings", "Quit"};
+    public String[] options = {"Continue", "New Game", "Leaderboard", "Settings", "Quit"};
     public int currentSelection = 0;
     private boolean hasSaveFile = false;
     private BufferedImage backgroundImage;
@@ -49,11 +48,7 @@ public class MainMenu {
         }
         
         // Update stats
-        if (TelemetryClient.isActive()) {
-            careerPlaytimeStr = "CAREER PLAYTIME: " + TelemetryClient.formatPlaytime(TelemetryClient.getTotalPlaytimeSeconds());
-        } else {
-            careerPlaytimeStr = "SESSION NOT STARTED";
-        }
+        careerPlaytimeStr = "";
     }
     
     private void loadTitle(String path) {

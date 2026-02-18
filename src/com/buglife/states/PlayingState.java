@@ -16,7 +16,6 @@ import com.buglife.entities.Player;
 import com.buglife.entities.Snail;
 import com.buglife.utils.PerformanceMonitor;
 import com.buglife.utils.DebugExporter;
-import com.buglife.utils.TelemetryClient;
 import com.buglife.save.SaveData;
 import com.buglife.save.SaveManager;
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ public class PlayingState extends GameState {
 
     // Level progression
     private String currentLevel = "level1";
-    private final String[] levelOrder = { "level1", "level2", "level3", "level4", "level5" };
+    private final String[] levelOrder = { "level1", "level2" };
     private int currentLevelIndex = 0;
     
     // Current level configuration (loaded from levels/ package)
@@ -285,7 +284,6 @@ public class PlayingState extends GameState {
         }
             
         if (player.hasDiedFromWeb()) {
-            TelemetryClient.onPlayerDeath(player.getX(), player.getY(), "Entrapped - Spider Webbed");
             logger.info("Game Over: Player died from webbed state");
             soundManager.stopSound("music");
             soundManager.stopSound("chasing");
@@ -310,7 +308,6 @@ public class PlayingState extends GameState {
                     }
                     
                     if (player.getHunger() <= 0) {
-                        TelemetryClient.onPlayerDeath(player.getX(), player.getY(), "Exhaustion - Caught with zero hunger");
                         logger.info("Game Over: Player caught with zero hunger");
                         soundManager.stopSound("music");
                         soundManager.stopSound("chasing");
@@ -321,7 +318,6 @@ public class PlayingState extends GameState {
 
                     if (currentSpider.isChasing()) {
                         if (player.isCrying()) {
-                            TelemetryClient.onPlayerDeath(player.getX(), player.getY(), "Exhaustion - Caught while Crying");
                             logger.info("Game Over: Player caught by spider while crying");
                             soundManager.stopSound("music");
                             soundManager.stopSound("chasing");
@@ -360,15 +356,12 @@ public class PlayingState extends GameState {
         }
 
         if (player.isOnLevelCompleteTile()) {
-            int timeSpent = (int) ((System.currentTimeMillis() - levelStartTime) / 1000);
-            TelemetryClient.onLevelComplete(player.getX(), player.getY(), currentLevel, timeSpent);
             soundManager.stopAllSounds();
             soundManager.playSound("level_complete");
             manager.setState(GameStateManager.LEVEL_COMPLETE);
             return;
         }
         if (player.getHunger() <= 0 && !player.isCrying()) {
-            TelemetryClient.onPlayerDeath(player.getX(), player.getY(), "Starvation - Hunger reached zero");
             soundManager.stopSound("music");
             soundManager.playSound("chasing");
             soundManager.playSound("gameOver");
@@ -936,7 +929,6 @@ public class PlayingState extends GameState {
         if (player.isCrying()) {
             for (Spider spider : spiders) {
                 if (spider != null && spider.getCurrentState() == Spider.SpiderState.PATROLLING) {
-                    TelemetryClient.onEnemyAlert(player.getX(), player.getY(), "Spider - Attracted by Noise");
                     spider.startChasing(player, soundManager);
                 }
             }

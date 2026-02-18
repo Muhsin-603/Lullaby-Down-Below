@@ -14,7 +14,6 @@ import com.buglife.assets.AssetManager;
 import com.buglife.world.World;
 import com.buglife.config.GameConstants;
 import com.buglife.config.TileConstants;
-import com.buglife.utils.TelemetryClient;
 
 public class Player {
     private static final Logger logger = LoggerFactory.getLogger(Player.class);
@@ -126,7 +125,6 @@ public class Player {
             // Apply 5 seconds of speed (60 fps * 5)
             this.speedBoostTimer = 300;
         }
-        TelemetryClient.onItemUsed((float) this.x, (float) this.y, food.getType().name());
     }
     // Add this method anywhere inside your Player class
 
@@ -416,9 +414,6 @@ public class Player {
             if (cryDeathTimer <= 0) {
                 this.hunger = 0;
             }
-            if (cryDeathTimer == 0) {
-                TelemetryClient.onPlayerDeath((float) this.x, (float) this.y, "STARVATION");
-            }
         } else {
             hungerDrainTimer++;
             if (hungerDrainTimer > 120) {
@@ -465,12 +460,6 @@ public class Player {
         int playerTileRow = getCenterY() / World.TILE_SIZE;
 
         if (world.getTileIdAt(playerTileCol, playerTileRow) == TileConstants.LADDER_3) {
-            if (!this.onLevelCompleteTile) { // Only log it the FIRST frame they step on it
-                TelemetryClient.onLevelComplete((float) this.x, (float) this.y, "Current_Level", 0); // Note: You'll
-                                                                                                     // need to pass the
-                                                                                                     // real timer/level
-                                                                                                     // name later
-            }
             this.onLevelCompleteTile = true;
         } else {
             this.onLevelCompleteTile = false;

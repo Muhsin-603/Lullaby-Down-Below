@@ -198,6 +198,11 @@
                                 <exclude>**/engine/editor/**</exclude>
                                 <exclude>**/utils/DebugExporter.java</exclude>
                                 <exclude>**/utils/PerformanceMonitor.java</exclude>
+                                <exclude>**/utils/TelemetryClient.java</exclude>
+                                <exclude>**/levels/LevelTestConfig.java</exclude>
+                                <exclude>**/levels/Level3Config.java</exclude>
+                                <exclude>**/levels/Level4Config.java</exclude>
+                                <exclude>**/levels/Level5Config.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
@@ -219,8 +224,17 @@
                                 <exclude>**/engine/editor/**</exclude>
                                 <exclude>**/utils/DebugExporter*</exclude>
                                 <exclude>**/utils/PerformanceMonitor*</exclude>
+                                <exclude>**/utils/TelemetryClient*</exclude>
+                                <exclude>**/levels/LevelTestConfig*</exclude>
+                                <exclude>**/levels/Level3Config*</exclude>
+                                <exclude>**/levels/Level4Config*</exclude>
+                                <exclude>**/levels/Level5Config*</exclude>
                                 <exclude>debug-settings.json</exclude>
                                 <exclude>logback.xml</exclude>
+                                <exclude>res/maps/level_test.txt</exclude>
+                                <exclude>res/maps/level3.txt</exclude>
+                                <exclude>res/maps/level4.txt</exclude>
+                                <exclude>res/maps/level5.txt</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
