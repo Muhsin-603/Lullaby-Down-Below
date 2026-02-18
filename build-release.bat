@@ -32,11 +32,11 @@ if %ERRORLEVEL% equ 0 (
     echo Dev tool scripts removed.
     echo.
 
-    echo Copying save files for distribution...
+    echo Copying test user save files for distribution...
     if not exist target\saves mkdir target\saves
     if exist saves\*.sav copy saves\*.sav target\saves\ >nul
     if exist saves\.profiles.json copy saves\.profiles.json target\saves\ >nul
-    echo Save files copied to target\saves.
+    echo Test user save files copied to target\saves.
     echo.
 
     echo This JAR is ready for distribution to players.

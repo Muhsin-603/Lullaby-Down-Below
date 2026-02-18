@@ -47,7 +47,7 @@ public class MainMenu {
             }
         }
         
-        // Update stats
+        // Playtime tracking removed with telemetry system
         careerPlaytimeStr = "";
     }
     

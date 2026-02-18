@@ -74,7 +74,7 @@ public class SaveManager {
         }
         save.setRemainingFoods(foodStates);
 
-        // IT IS TIME (TRACKING CAREER)
+        // Playtime tracking removed with telemetry system
         save.setTotalPlaytimeSeconds(0);
 
         // META
