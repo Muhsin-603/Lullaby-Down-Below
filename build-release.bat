@@ -21,6 +21,14 @@ if %ERRORLEVEL% equ 0 (
     echo ========================================
     echo Release JAR: target\lullaby-down-below-1.5.0-release.jar
     echo.
+
+    echo Cleaning up dev tool scripts from release directory...
+    if exist run-level-editor.bat del run-level-editor.bat
+    if exist run-map-preview.bat del run-map-preview.bat
+    if exist build-dev.bat del build-dev.bat
+    echo Dev tool scripts removed.
+    echo.
+
     echo This JAR is ready for distribution to players.
     echo.
 ) else (
