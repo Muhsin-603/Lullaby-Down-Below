@@ -1,19 +1,25 @@
 package com.buglife.main;
 
-import javax.swing.*;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.buglife.assets.SoundManager;
-import com.buglife.utils.PerformanceMonitor;
 import com.buglife.config.ConfigManager;
 import com.buglife.config.GameConstants;
 import com.buglife.save.SaveManager;
 import com.buglife.save.UserProfile;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
+import com.buglife.utils.PerformanceMonitor;
 
 public class Game implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Game.class);
@@ -91,23 +97,42 @@ public class Game implements Runnable {
 
     /**
      * This is the Game Loop. It will run continuously.
+     * Enhanced with frame timing tracking for debug overlay.
      */
     @Override
     public void run() {
         final double timePerFrame = 1_000_000_000.0 / FPS;
+        PerformanceMonitor monitor = PerformanceMonitor.getInstance();
 
         while (running) {
             long frameStart = System.nanoTime();
 
-            // Update performance monitor
-            PerformanceMonitor.getInstance().update();
-
-            // Update and render
+            // ============================================================
+            // UPDATE PHASE - Track timing
+            // ============================================================
+            long updateStart = System.nanoTime();
             gamePanel.updateGame();
+            long updateEnd = System.nanoTime();
+            double updateMs = (updateEnd - updateStart) / 1_000_000.0;
+
+            // ============================================================
+            // RENDER PHASE - Track timing
+            // ============================================================
+            long renderStart = System.nanoTime();
             gamePanel.paintImmediately(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
             Toolkit.getDefaultToolkit().sync();
+            long renderEnd = System.nanoTime();
+            double renderMs = (renderEnd - renderStart) / 1_000_000.0;
 
-            // Calculate and apply frame limiting
+            // ============================================================
+            // PERFORMANCE MONITORING - Update metrics
+            // ============================================================
+            monitor.setFrameTiming(updateMs, renderMs);
+            monitor.update();
+
+            // ============================================================
+            // FRAME LIMITING - Sleep to maintain target FPS
+            // ============================================================
             long workTime = System.nanoTime() - frameStart;
             long sleepTime = (long) (timePerFrame - workTime);
 
@@ -125,7 +150,7 @@ public class Game implements Runnable {
     }
 
     /**
-     * The main entry point for our application.
+     * Cleanup and shutdown procedure.
      */
     public void cleanup() {
         running = false;
@@ -154,6 +179,9 @@ public class Game implements Runnable {
         }
     }
 
+    /**
+     * The main entry point for our application.
+     */
     public static void main(String[] args) {
         Game game = new Game();
         game.startGameThread();
