@@ -1,18 +1,20 @@
 package com.buglife.main;
 
 import java.awt.Graphics2D;
-import com.buglife.assets.SoundManager;
-import com.buglife.states.GameState;
-import com.buglife.states.IdentifyState;
-import com.buglife.states.LeaderboardState;
-import com.buglife.states.MenuState;
-import com.buglife.states.PlayingState;
-import com.buglife.states.SettingsState;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.buglife.assets.SoundManager;
 import com.buglife.states.GameOverState;
+import com.buglife.states.GameState;
+import com.buglife.states.IdentifyState;
+import com.buglife.states.LeaderboardState;
 import com.buglife.states.LevelCompleteState;
+import com.buglife.states.LoadingState;
+import com.buglife.states.MenuState;
+import com.buglife.states.PlayingState;
+import com.buglife.states.SettingsState;
 
 public class GameStateManager {
     private static final Logger logger = LoggerFactory.getLogger(GameStateManager.class);
@@ -25,6 +27,7 @@ public class GameStateManager {
     public static final int SETTINGS = 5;
     public static final int IDENTIFY = 6;
     public static final int LEADERBOARD = 7;
+    public static final int LOADING = 8;
 
     private GameState currentState;
     private int nextStateID = -1;
@@ -35,6 +38,7 @@ public class GameStateManager {
     private IdentifyState identifyState;
     private MenuState menuState;
     private PlayingState playingState;
+    private LoadingState loadingState;
 
     private GameOverState gameOverState;
     private SettingsState settingsState;
@@ -103,6 +107,9 @@ public class GameStateManager {
                 break;
             case LEADERBOARD:
                 currentState = leaderboardState;
+                break;
+             case LOADING: 
+                currentState = loadingState;
                 break;
             default:
                 logger.error("Unknown state ID: {}", nextStateID);
@@ -174,5 +181,18 @@ public class GameStateManager {
      */
     public GamePanel getGamePanel() {
         return gamePanel;
+    }
+    /**
+     * Transition to loading screen before loading next level.
+     * 
+     * @param nextLevelName    The level ID to load (e.g., "level2")
+     * @param displayName      Human-readable name (e.g., "Level 2")
+     * @param playingState     Reference to PlayingState to call back when done
+     */
+    public void setLoadingState(String nextLevelName, String displayName, PlayingState playingState) {
+    // Create a new LoadingState instance with the target level info
+        this.loadingState = new LoadingState(this, nextLevelName, displayName, playingState);
+        setState(LOADING);
+        logger.info("Transitioning to LoadingState for level: {}", displayName);
     }
 }

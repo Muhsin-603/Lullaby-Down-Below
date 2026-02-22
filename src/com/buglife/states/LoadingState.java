@@ -7,6 +7,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
+import com.buglife.main.GameStateManager;
+
 /**
  * LoadingState - Displays an atmospheric loading screen between levels.
  *
@@ -58,6 +60,8 @@ public class LoadingState extends GameState {
         "Every web can be escaped... if you're fast enough."
     };
     private int tipIndex = 0;
+    private String nextLevelId; 
+    private PlayingState playingState;
 
     // ─────────────────────────────────────────────────────────────
     //  Constructor
@@ -70,14 +74,15 @@ public class LoadingState extends GameState {
      * @param nextLevelIndex  which level to load next (1-based)
      * @param nextLevelName   human-readable name for display ("Level 2" etc.)
      */
-    public LoadingState(GameStateManager gsm, int nextLevelIndex, String nextLevelName) {
+    public LoadingState(GameStateManager gsm, String nextLevelId, String nextLevelName, PlayingState playingState) {
         super(gsm);
-        this.nextLevelIndex = nextLevelIndex;
-        this.nextLevelName  = nextLevelName;
-        this.loadStartTime  = System.currentTimeMillis();
+        this.nextLevelId = nextLevelId;
+        this.nextLevelName = nextLevelName;
+        this.playingState = playingState;
+        this.loadStartTime = System.currentTimeMillis();
         // pick a random tip each time
         this.tipIndex = (int)(Math.random() * TIPS.length);
-    }
+}
 
     // ─────────────────────────────────────────────────────────────
     //  Update  (called once per game tick / ~60 FPS)
@@ -106,9 +111,11 @@ public class LoadingState extends GameState {
             case FADE_OUT:
                 alpha = Math.max(0.0f, alpha - FADE_SPEED);
                 if (alpha <= 0.0f) {
-                    isFinished = true;   // signal to switch to next level
-                    // Transition to the next PlayingState with the loaded level
-                    gsm.setState(GameStateManager.PLAYING, nextLevelIndex);
+                    isFinished = true;
+                    // Tell PlayingState to actually load the level
+                    playingState.loadLevel(nextLevelId);
+                    // Switch back to playing state
+                    gsm.setState(GameStateManager.PLAYING);
                 }
                 break;
         }
