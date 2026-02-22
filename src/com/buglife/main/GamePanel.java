@@ -174,54 +174,57 @@ public class GamePanel extends JPanel {
     private class KeyInputAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
-            PerformanceMonitor monitor = PerformanceMonitor.getInstance();
-            
-            // F3 key toggles performance overlay
-            if (e.getKeyCode() == KeyEvent.VK_F3) {
-                monitor.toggleDebugOverlay();
-                return;
-            }
-            
-            // F2 key toggles spider debug menu
-            if (e.getKeyCode() == KeyEvent.VK_F2) {
-                monitor.toggleSpiderTogglesMenu();
-                return;
-            }
-            
-            // F4 key toggles hitboxes
-            if (e.getKeyCode() == KeyEvent.VK_F4) {
-                monitor.toggleHitboxes();
-                return;
-            }
-            
-            // F5 key toggles tile grid
-            if (e.getKeyCode() == KeyEvent.VK_F5) {
-                monitor.toggleTileGrid();
-                return;
-            }
-            
-            // F6 key toggles spider paths
-            if (e.getKeyCode() == KeyEvent.VK_F6) {
-                monitor.toggleSpiderPaths();
-                return;
-            }
-            
-            // F7 key toggles god mode
-            if (e.getKeyCode() == KeyEvent.VK_F7) {
-                monitor.toggleGodMode();
-                return;
-            }
-            
-            // P key toggles spider patrol (when spider menu is visible)
-            if (e.getKeyCode() == KeyEvent.VK_P && monitor.isSpiderTogglesVisible()) {
-                monitor.toggleSpiderPatrol();
-                return;
-            }
-            
-            // D key toggles spider detection (when spider menu is visible)
-            if (e.getKeyCode() == KeyEvent.VK_Y && monitor.isSpiderTogglesVisible()) {
-                monitor.toggleSpiderDetection();
-                return;
+            // All debug keybinds are dev-only
+            if (!PerformanceMonitor.isReleaseMode()) {
+                PerformanceMonitor monitor = PerformanceMonitor.getInstance();
+                
+                // F3 key toggles performance overlay
+                if (e.getKeyCode() == KeyEvent.VK_F3) {
+                    monitor.toggleDebugOverlay();
+                    return;
+                }
+                
+                // F2 key toggles spider debug menu
+                if (e.getKeyCode() == KeyEvent.VK_F2) {
+                    monitor.toggleSpiderTogglesMenu();
+                    return;
+                }
+                
+                // F4 key toggles hitboxes
+                if (e.getKeyCode() == KeyEvent.VK_F4) {
+                    monitor.toggleHitboxes();
+                    return;
+                }
+                
+                // F5 key toggles tile grid
+                if (e.getKeyCode() == KeyEvent.VK_F5) {
+                    monitor.toggleTileGrid();
+                    return;
+                }
+                
+                // F6 key toggles spider paths
+                if (e.getKeyCode() == KeyEvent.VK_F6) {
+                    monitor.toggleSpiderPaths();
+                    return;
+                }
+                
+                // F7 key toggles god mode
+                if (e.getKeyCode() == KeyEvent.VK_F7) {
+                    monitor.toggleGodMode();
+                    return;
+                }
+                
+                // P key toggles spider patrol (when spider menu is visible)
+                if (e.getKeyCode() == KeyEvent.VK_P && monitor.isSpiderTogglesVisible()) {
+                    monitor.toggleSpiderPatrol();
+                    return;
+                }
+                
+                // D key toggles spider detection (when spider menu is visible)
+                if (e.getKeyCode() == KeyEvent.VK_Y && monitor.isSpiderTogglesVisible()) {
+                    monitor.toggleSpiderDetection();
+                    return;
+                }
             }
             
             stateManager.keyPressed(e.getKeyCode());
