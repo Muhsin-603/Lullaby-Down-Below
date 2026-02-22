@@ -7,28 +7,30 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Iterator; 
 import java.util.List;
-import java.util.Iterator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.buglife.assets.SoundManager;
 import com.buglife.entities.Food;
 import com.buglife.entities.Player;
 import com.buglife.entities.Snail;
-import com.buglife.utils.PerformanceMonitor;
-import com.buglife.utils.DebugExporter;
-import com.buglife.save.SaveData;
-import com.buglife.save.SaveManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.buglife.entities.Spider;
 import com.buglife.entities.Toy;
 import com.buglife.entities.TripWire;
+import com.buglife.levels.FoodSpawnData;
 import com.buglife.levels.LevelConfig;
 import com.buglife.levels.LevelConfigFactory;
-import com.buglife.levels.FoodSpawnData;
 import com.buglife.levels.SnailLocationData;
 import com.buglife.levels.SpiderPatrolData;
 import com.buglife.main.GameStateManager;
+import com.buglife.save.SaveData;
+import com.buglife.save.SaveManager;
+import com.buglife.utils.DebugExporter;
+import com.buglife.utils.DebugOverlay;
+import com.buglife.utils.PerformanceMonitor;
 import com.buglife.world.World;
 
 public class PlayingState extends GameState {
@@ -472,6 +474,8 @@ public class PlayingState extends GameState {
         if (isPaused) {
             drawPauseMenu(g);
         }
+        // Draw debug overlay (F3) - NEW!
+        DebugOverlay.render(g, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         
         // Draw level selection menu overlay (on top of everything)
         if (PerformanceMonitor.getInstance().isLevelMenuVisible()) {
