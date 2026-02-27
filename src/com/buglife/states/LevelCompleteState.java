@@ -99,8 +99,7 @@ public class LevelCompleteState extends GameState {
         if (keyCode == KeyEvent.VK_ENTER) {
             String selected = options[selectedOption];
             if (selected.equals("Next Level")) {
-                manager.getPlayingState().goToNextLevel();
-                manager.setState(GameStateManager.PLAYING);
+                manager.setState(GameStateManager.LOADING);
             } else if (selected.equals("Main Menu")) {
                 manager.setState(GameStateManager.MENU);
             }
