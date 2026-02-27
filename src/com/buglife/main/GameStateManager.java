@@ -1,20 +1,19 @@
 package com.buglife.main;
 
 import java.awt.Graphics2D;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.buglife.assets.SoundManager;
-import com.buglife.states.GameOverState;
 import com.buglife.states.GameState;
 import com.buglife.states.IdentifyState;
 import com.buglife.states.LeaderboardState;
-import com.buglife.states.LevelCompleteState;
-import com.buglife.states.LoadingState;
 import com.buglife.states.MenuState;
 import com.buglife.states.PlayingState;
 import com.buglife.states.SettingsState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.buglife.states.GameOverState;
+import com.buglife.states.LevelCompleteState;
+import com.buglife.states.LoadingState;
 
 public class GameStateManager {
     private static final Logger logger = LoggerFactory.getLogger(GameStateManager.class);
@@ -180,6 +179,7 @@ public class GameStateManager {
     /**
      * Get the GamePanel instance for context.
      */
+
     public GamePanel getGamePanel() {
         return gamePanel;
     }
