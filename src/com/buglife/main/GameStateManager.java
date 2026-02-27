@@ -25,6 +25,7 @@ public class GameStateManager {
     public static final int SETTINGS = 5;
     public static final int IDENTIFY = 6;
     public static final int LEADERBOARD = 7;
+    public static final int LOADING = 8;
 
     private GameState currentState;
     private int nextStateID = -1;
@@ -39,22 +40,23 @@ public class GameStateManager {
     private GameOverState gameOverState;
     private SettingsState settingsState;
     private LevelCompleteState levelCompleteState;
-    private LeaderboardState leaderboardState;
+    private LoadingScreenState loadingState;
 
     public GameStateManager(SoundManager soundManager, GamePanel gamePanel) {
         this.soundManager = soundManager;
         this.gamePanel = gamePanel;
 
         // Pre-create states
-        this.identifyState = new IdentifyState(this, soundManager);
-        this.menuState = new MenuState(this, soundManager);
-        this.playingState = new PlayingState(this, soundManager);
+    this.identifyState = new IdentifyState(this, soundManager);
+    this.menuState = new MenuState(this, soundManager);
+    this.playingState = new PlayingState(this, soundManager);
 
-        //game over and won game state
-        this.gameOverState = new GameOverState(this, soundManager);
-        this.settingsState = new SettingsState(this, soundManager);
-        this.levelCompleteState = new LevelCompleteState(this, soundManager);
-        this.leaderboardState = new LeaderboardState(this, soundManager);
+    //game over and won game state
+    this.gameOverState = new GameOverState(this, soundManager);
+    this.settingsState = new SettingsState(this, soundManager);
+    this.levelCompleteState = new LevelCompleteState(this, soundManager);
+    this.leaderboardState = new LeaderboardState(this, soundManager);
+    this.loadingState = new LoadingScreenState(this, soundManager);
 
         // Start with identify screen (the gatekeeper)
         setState(IDENTIFY);
@@ -101,8 +103,8 @@ public class GameStateManager {
             case IDENTIFY:
                 currentState = identifyState;
                 break;
-            case LEADERBOARD:
-                currentState = leaderboardState;
+            case LOADING:
+                currentState = loadingState;
                 break;
             default:
                 logger.error("Unknown state ID: {}", nextStateID);
