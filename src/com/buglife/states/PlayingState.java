@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Iterator; 
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -29,6 +29,7 @@ import com.buglife.main.GameStateManager;
 import com.buglife.save.SaveData;
 import com.buglife.save.SaveManager;
 import com.buglife.utils.DebugExporter;
+import com.buglife.utils.DebugOverlay;
 import com.buglife.utils.PerformanceMonitor;
 import com.buglife.world.World;
 
@@ -491,9 +492,11 @@ public class PlayingState extends GameState {
         if (isPaused) {
             drawPauseMenu(g);
         }
+        // Draw debug overlay (F3) - NEW!
+        DebugOverlay.render(g, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         
-        // Draw level selection menu overlay (on top of everything)
-        if (PerformanceMonitor.getInstance().isLevelMenuVisible()) {
+        // Draw level selection menu overlay (on top of everything, dev only)
+        if (!PerformanceMonitor.isReleaseMode() && PerformanceMonitor.getInstance().isLevelMenuVisible()) {
             drawLevelSelectionMenu(g);
         }
     }
@@ -712,14 +715,14 @@ public class PlayingState extends GameState {
             }
         }
         
-        // L key: Toggle level selection menu
-        if (keyCode == KeyEvent.VK_L) {
+        // L key: Toggle level selection menu (dev only)
+        if (keyCode == KeyEvent.VK_L && !PerformanceMonitor.isReleaseMode()) {
             PerformanceMonitor.getInstance().toggleLevelMenu();
             return;
         }
         
         // Handle level menu navigation when visible
-        if (PerformanceMonitor.getInstance().isLevelMenuVisible()) {
+        if (!PerformanceMonitor.isReleaseMode() && PerformanceMonitor.getInstance().isLevelMenuVisible()) {
             if (keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_W) {
                 PerformanceMonitor.getInstance().levelSelectionUp();
                 soundManager.playSound("menu");
@@ -741,20 +744,27 @@ public class PlayingState extends GameState {
             // (will be handled by pause menu check above)
         }
         
-        // F12: Export game state for debugging
-        if (keyCode == KeyEvent.VK_F12) {
-            PerformanceMonitor monitor = PerformanceMonitor.getInstance();
-            DebugExporter.exportGameState(
-                currentLevel,
-                player.getCenterX(),
-                player.getCenterY(),
-                player.getHunger(),
-                player.getCurrentState(),
-                spiders.size(),
-                snail != null ? snail.getLocationsCount() : 0,
-                foods.size()
-            );
-            logger.info("Game state exported via F12");
+        // F12: Export game state for debugging (dev only)
+        if (keyCode == KeyEvent.VK_F12 && !PerformanceMonitor.isReleaseMode()) {
+            try {
+                PerformanceMonitor monitor = PerformanceMonitor.getInstance();
+                Class<?> exporterClass = Class.forName("com.buglife.utils.DebugExporter");
+                java.lang.reflect.Method exportMethod = exporterClass.getMethod(
+                    "exportGameState", String.class, int.class, int.class, int.class,
+                    String.class, int.class, int.class, int.class);
+                exportMethod.invoke(null,
+                    currentLevel,
+                    player.getCenterX(),
+                    player.getCenterY(),
+                    player.getHunger(),
+                    player.getCurrentState(),
+                    spiders.size(),
+                    snail != null ? snail.getLocationsCount() : 0,
+                    foods.size());
+                logger.info("Game state exported via F12");
+            } catch (Exception e) {
+                logger.warn("Debug export not available");
+            }
         }
     }
 

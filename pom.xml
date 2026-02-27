@@ -19,7 +19,7 @@
         <slf4j.version>2.0.17</slf4j.version>
         <logback.version>1.5.25</logback.version>
         <junit.version>6.0.3</junit.version>
-        <jackson.version>2.21.0</jackson.version>
+        <jackson.version>2.21.1</jackson.version>
     </properties>
 
     <dependencies>
@@ -107,7 +107,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.4</version>
+                <version>3.5.5</version>
             </plugin>
 
             <!-- Maven JAR Plugin -->
@@ -197,12 +197,8 @@
                                 <exclude>**/tools/**</exclude>
                                 <exclude>**/engine/editor/**</exclude>
                                 <exclude>**/utils/DebugExporter.java</exclude>
-                                <exclude>**/utils/PerformanceMonitor.java</exclude>
                                 <exclude>**/utils/TelemetryClient.java</exclude>
                                 <exclude>**/levels/LevelTestConfig.java</exclude>
-                                <exclude>**/levels/Level3Config.java</exclude>
-                                <exclude>**/levels/Level4Config.java</exclude>
-                                <exclude>**/levels/Level5Config.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
@@ -223,18 +219,11 @@
                                 <exclude>**/tools/**</exclude>
                                 <exclude>**/engine/editor/**</exclude>
                                 <exclude>**/utils/DebugExporter*</exclude>
-                                <exclude>**/utils/PerformanceMonitor*</exclude>
                                 <exclude>**/utils/TelemetryClient*</exclude>
                                 <exclude>**/levels/LevelTestConfig*</exclude>
-                                <exclude>**/levels/Level3Config*</exclude>
-                                <exclude>**/levels/Level4Config*</exclude>
-                                <exclude>**/levels/Level5Config*</exclude>
                                 <exclude>debug-settings.json</exclude>
                                 <exclude>logback.xml</exclude>
                                 <exclude>res/maps/level_test.txt</exclude>
-                                <exclude>res/maps/level3.txt</exclude>
-                                <exclude>res/maps/level4.txt</exclude>
-                                <exclude>res/maps/level5.txt</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
@@ -255,6 +244,11 @@
                                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                             <mainClass>com.buglife.main.Game</mainClass>
                                         </transformer>
+                                        <!-- Merge duplicate service files instead of overwriting -->
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                        <!-- Keep only one copy of LICENSE/NOTICE -->
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"/>
                                     </transformers>
                                     <filters>
                                         <filter>
@@ -263,6 +257,11 @@
                                                 <exclude>META-INF/*.SF</exclude>
                                                 <exclude>META-INF/*.DSA</exclude>
                                                 <exclude>META-INF/*.RSA</exclude>
+                                                <exclude>META-INF/MANIFEST.MF</exclude>
+                                                <exclude>META-INF/LICENSE</exclude>
+                                                <exclude>META-INF/NOTICE</exclude>
+                                                <exclude>module-info.class</exclude>
+                                                <exclude>META-INF/versions/*/module-info.class</exclude>
                                             </excludes>
                                         </filter>
                                     </filters>

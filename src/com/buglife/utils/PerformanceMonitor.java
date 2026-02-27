@@ -20,6 +20,29 @@ public class PerformanceMonitor {
     private static PerformanceMonitor instance;
     private static final String DEBUG_CONFIG_PATH = "src/main/resources/debug-settings.json";
     
+    /**
+     * Release mode flag. When true, ALL debug features are disabled.
+     * Detected automatically: if DebugExporter class is not on the classpath,
+     * we're running a release build.
+     */
+    private static final boolean RELEASE_MODE = detectReleaseMode();
+    
+    private static boolean detectReleaseMode() {
+        try {
+            Class.forName("com.buglife.utils.DebugExporter");
+            return false; // Dev build — DebugExporter exists
+        } catch (ClassNotFoundException e) {
+            return true;  // Release build — DebugExporter was excluded
+        }
+    }
+    
+    /**
+     * Check if running in release mode (no dev tools available).
+     */
+    public static boolean isReleaseMode() {
+        return RELEASE_MODE;
+    }
+    
     // private long lastFrameTime;
     private long frameCount;
     private double currentFPS;
@@ -93,8 +116,14 @@ public class PerformanceMonitor {
         this.frameTimes = new double[60];
         this.frameTimeIndex = 0;
         
-        // Load debug settings from JSON
-        loadDebugConfig();
+        if (RELEASE_MODE) {
+            // Release mode: force safe defaults, no debug features
+            setDefaultDebugSettings();
+            logger.info("PerformanceMonitor running in RELEASE mode (debug features disabled)");
+        } else {
+            // Dev mode: load debug settings from JSON
+            loadDebugConfig();
+        }
     }
     
     public static PerformanceMonitor getInstance() {
@@ -258,6 +287,7 @@ public class PerformanceMonitor {
      * Toggle spider debug menu visibility
      */
     public void toggleSpiderTogglesMenu() {
+        if (RELEASE_MODE) return;
         showSpiderToggles = !showSpiderToggles;
         logger.info("Spider debug menu: {}", showSpiderToggles ? "ON" : "OFF");
         saveDebugConfig();
@@ -267,6 +297,7 @@ public class PerformanceMonitor {
      * Toggle spider patrol movement
      */
     public void toggleSpiderPatrol() {
+        if (RELEASE_MODE) return;
         spiderPatrolEnabled = !spiderPatrolEnabled;
         logger.info("Spider patrol: {}", spiderPatrolEnabled ? "ENABLED" : "DISABLED");
         saveDebugConfig();
@@ -276,6 +307,7 @@ public class PerformanceMonitor {
      * Toggle spider detection/chasing
      */
     public void toggleSpiderDetection() {
+        if (RELEASE_MODE) return;
         spiderDetectionEnabled = !spiderDetectionEnabled;
         logger.info("Spider detection: {}", spiderDetectionEnabled ? "ENABLED" : "DISABLED");
         saveDebugConfig();
@@ -308,6 +340,7 @@ public class PerformanceMonitor {
      * Toggle level selection menu visibility
      */
     public void toggleLevelMenu() {
+        if (RELEASE_MODE) return;
         showLevelMenu = !showLevelMenu;
         logger.info("Level selection menu: {}", showLevelMenu ? "ON" : "OFF");
         saveDebugConfig();
@@ -394,6 +427,7 @@ public class PerformanceMonitor {
      * Toggle hitbox visualization
      */
     public void toggleHitboxes() {
+        if (RELEASE_MODE) return;
         showHitboxes = !showHitboxes;
         logger.info("Hitbox visualization: {}", showHitboxes ? "ON" : "OFF");
         saveDebugConfig();
@@ -403,6 +437,7 @@ public class PerformanceMonitor {
      * Toggle tile grid overlay
      */
     public void toggleTileGrid() {
+        if (RELEASE_MODE) return;
         showTileGrid = !showTileGrid;
         logger.info("Tile grid: {}", showTileGrid ? "ON" : "OFF");
         saveDebugConfig();
@@ -412,6 +447,7 @@ public class PerformanceMonitor {
      * Toggle spider path visualization
      */
     public void toggleSpiderPaths() {
+        if (RELEASE_MODE) return;
         showSpiderPaths = !showSpiderPaths;
         logger.info("Spider paths: {}", showSpiderPaths ? "ON" : "OFF");
         saveDebugConfig();
@@ -421,6 +457,7 @@ public class PerformanceMonitor {
      * Toggle god mode
      */
     public void toggleGodMode() {
+        if (RELEASE_MODE) return;
         godMode = !godMode;
         logger.info("God mode: {}", godMode ? "ON" : "OFF");
         saveDebugConfig();
@@ -642,6 +679,7 @@ public class PerformanceMonitor {
      * Toggle debug overlay
      */
     public void toggleDebugOverlay() {
+        if (RELEASE_MODE) return;
         showDebugOverlay = !showDebugOverlay;
         logger.info("Debug overlay: {}", showDebugOverlay ? "ON" : "OFF");
         saveDebugConfig();
