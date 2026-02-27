@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.buglife.states.GameOverState;
 import com.buglife.states.LevelCompleteState;
+import com.buglife.states.LoadingState;
 
 public class GameStateManager {
     private static final Logger logger = LoggerFactory.getLogger(GameStateManager.class);
@@ -25,6 +26,7 @@ public class GameStateManager {
     public static final int SETTINGS = 5;
     public static final int IDENTIFY = 6;
     public static final int LEADERBOARD = 7;
+    public static final int LOADING = 8;
 
     private GameState currentState;
     private int nextStateID = -1;
@@ -40,6 +42,8 @@ public class GameStateManager {
     private SettingsState settingsState;
     private LevelCompleteState levelCompleteState;
     private LeaderboardState leaderboardState;
+    private LoadingState loadingState;
+
 
     public GameStateManager(SoundManager soundManager, GamePanel gamePanel) {
         this.soundManager = soundManager;
@@ -103,6 +107,9 @@ public class GameStateManager {
                 break;
             case LEADERBOARD:
                 currentState = leaderboardState;
+                break;
+            case LOADING:
+                currentState = loadingState;
                 break;
             default:
                 logger.error("Unknown state ID: {}", nextStateID);
@@ -172,7 +179,20 @@ public class GameStateManager {
     /**
      * Get the GamePanel instance for context.
      */
+
     public GamePanel getGamePanel() {
         return gamePanel;
+    }
+    /**
+     * Transition to loading screen before loading next level.
+     *
+     * @param nextLevelId    The level ID to load (e.g., "level2")
+     * @param displayName    Human-readable name (e.g., "Level 2")
+     * @param playingState   Reference to PlayingState to call back when done
+     */
+    public void setLoadingState(String nextLevelId, String displayName, PlayingState playingState) {
+        this.loadingState = new LoadingState(this, nextLevelId, displayName, playingState);
+        setState(LOADING);
+        logger.info("Transitioning to LoadingState for level: {}", displayName);
     }
 }

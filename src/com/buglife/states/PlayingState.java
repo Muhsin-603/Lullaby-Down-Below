@@ -7,8 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Iterator; 
 import java.util.List;
+import java.util.Iterator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,16 +20,15 @@ import com.buglife.entities.Snail;
 import com.buglife.entities.Spider;
 import com.buglife.entities.Toy;
 import com.buglife.entities.TripWire;
-import com.buglife.levels.FoodSpawnData;
 import com.buglife.levels.LevelConfig;
 import com.buglife.levels.LevelConfigFactory;
+import com.buglife.levels.FoodSpawnData;
 import com.buglife.levels.SnailLocationData;
 import com.buglife.levels.SpiderPatrolData;
 import com.buglife.main.GameStateManager;
 import com.buglife.save.SaveData;
 import com.buglife.save.SaveManager;
 import com.buglife.utils.DebugExporter;
-import com.buglife.utils.DebugOverlay;
 import com.buglife.utils.PerformanceMonitor;
 import com.buglife.world.World;
 
@@ -189,7 +188,25 @@ public class PlayingState extends GameState {
             manager.setState(GameStateManager.MENU);
             return;
         }
-        currentLevel = levelOrder[currentLevelIndex];
+        
+        // Show loading screen before loading next level
+        String nextLevel = levelOrder[currentLevelIndex];
+        String levelDisplayName = "Level " + (currentLevelIndex + 1);
+        manager.setLoadingState(nextLevel, levelDisplayName, this);
+    }
+
+    /**
+     * Called by LoadingState when loading animation completes.
+     * Actually loads and initializes the next level.
+     */
+    public void loadLevel(String levelName) {
+        this.currentLevel = levelName;
+        for (int i = 0; i < levelOrder.length; i++) {
+            if (levelOrder[i].equals(levelName)) {
+                currentLevelIndex = i;
+                break;
+            }
+        }
         this.hasBeenInitialized = false;
         init();
     }
