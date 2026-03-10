@@ -97,7 +97,6 @@ public class Game implements Runnable {
 
     /**
      * This is the Game Loop. It will run continuously.
-     * Enhanced with frame timing tracking for debug overlay.
      */
     @Override
     public void run() {
@@ -107,32 +106,22 @@ public class Game implements Runnable {
         while (running) {
             long frameStart = System.nanoTime();
 
-            // ============================================================
-            // UPDATE PHASE - Track timing
-            // ============================================================
+            // Update phase - track timing for debug overlay
             long updateStart = System.nanoTime();
             gamePanel.updateGame();
-            long updateEnd = System.nanoTime();
-            double updateMs = (updateEnd - updateStart) / 1_000_000.0;
+            double updateMs = (System.nanoTime() - updateStart) / 1_000_000.0;
 
-            // ============================================================
-            // RENDER PHASE - Track timing
-            // ============================================================
+            // Render phase - track timing for debug overlay
             long renderStart = System.nanoTime();
             gamePanel.paintImmediately(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
             Toolkit.getDefaultToolkit().sync();
-            long renderEnd = System.nanoTime();
-            double renderMs = (renderEnd - renderStart) / 1_000_000.0;
+            double renderMs = (System.nanoTime() - renderStart) / 1_000_000.0;
 
-            // ============================================================
-            // PERFORMANCE MONITORING - Update metrics
-            // ============================================================
+            // Update performance monitor with frame timing data
             monitor.setFrameTiming(updateMs, renderMs);
             monitor.update();
 
-            // ============================================================
-            // FRAME LIMITING - Sleep to maintain target FPS
-            // ============================================================
+            // Calculate and apply frame limiting
             long workTime = System.nanoTime() - frameStart;
             long sleepTime = (long) (timePerFrame - workTime);
 
