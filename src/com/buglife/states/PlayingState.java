@@ -28,7 +28,6 @@ import com.buglife.levels.SpiderPatrolData;
 import com.buglife.main.GameStateManager;
 import com.buglife.save.SaveData;
 import com.buglife.save.SaveManager;
-import com.buglife.utils.DebugOverlay;
 import com.buglife.utils.PerformanceMonitor;
 import com.buglife.world.World;
 
@@ -473,8 +472,6 @@ public class PlayingState extends GameState {
         if (isPaused) {
             drawPauseMenu(g);
         }
-        // Draw debug overlay (toggle with F3)
-        DebugOverlay.render(g, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         
         // Draw level selection menu overlay (on top of everything, dev only)
         if (!PerformanceMonitor.isReleaseMode() && PerformanceMonitor.getInstance().isLevelMenuVisible()) {
