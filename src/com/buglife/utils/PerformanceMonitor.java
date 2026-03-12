@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.InputStream;
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -627,32 +626,21 @@ public class PerformanceMonitor {
         try {
             ObjectMapper mapper = new ObjectMapper();
             
-            // Create JSON structure
-            String json = String.format(
-                "{\n" +
-                "  \"spiderPatrolEnabled\": %s,\n" +
-                "  \"spiderDetectionEnabled\": %s,\n" +
-                "  \"showHitboxes\": %s,\n" +
-                "  \"showTileGrid\": %s,\n" +
-                "  \"showSpiderPaths\": %s,\n" +
-                "  \"godMode\": %s,\n" +
-                "  \"showDebugOverlay\": %s,\n" +
-                "  \"showLevelMenu\": %s\n" +
-                "}",
-                spiderPatrolEnabled,
-                spiderDetectionEnabled,
-                showHitboxes,
-                showTileGrid,
-                showSpiderPaths,
-                godMode,
-                showDebugOverlay,
-                showLevelMenu
-            );
+            // Build config map and serialize with Jackson
+            java.util.Map<String, Object> config = new java.util.LinkedHashMap<>();
+            config.put("spiderPatrolEnabled", spiderPatrolEnabled);
+            config.put("spiderDetectionEnabled", spiderDetectionEnabled);
+            config.put("showHitboxes", showHitboxes);
+            config.put("showTileGrid", showTileGrid);
+            config.put("showSpiderPaths", showSpiderPaths);
+            config.put("godMode", godMode);
+            config.put("showDebugOverlay", showDebugOverlay);
+            config.put("showLevelMenu", showLevelMenu);
             
-            // Write to file
-            try (FileWriter writer = new FileWriter(DEBUG_CONFIG_PATH)) {
-                writer.write(json);
-            }
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(config);
+            
+            // Write to file using Files and Paths
+            Files.writeString(Paths.get(DEBUG_CONFIG_PATH), json);
             
             logger.debug("Debug configuration saved");
         } catch (Exception e) {

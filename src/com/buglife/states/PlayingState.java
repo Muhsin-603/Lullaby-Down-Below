@@ -517,6 +517,15 @@ public class PlayingState extends GameState {
 
         // Coordinates now shown in F3 debug overlay instead of here
 
+        // Display elapsed level time using HUD_FONT
+        g.setFont(HUD_FONT);
+        g.setColor(Color.WHITE);
+        long elapsedSeconds = (System.currentTimeMillis() - levelStartTime) / 1000;
+        long mins = elapsedSeconds / 60;
+        long secs = elapsedSeconds % 60;
+        String timeStr = String.format("TIME: %d:%02d", mins, secs);
+        g.drawString(timeStr, VIRTUAL_WIDTH - 150, 25);
+
         if (player != null && player.isWebbed()) {
             g.setColor(Color.WHITE);
             g.setFont(MID_FONT);
@@ -742,7 +751,8 @@ public class PlayingState extends GameState {
                     spiders.size(),
                     snail != null ? snail.getLocationsCount() : 0,
                     foods.size());
-                logger.info("Game state exported via F12");
+                logger.info("Game state exported via F12 (FPS: {}, Overlay: {})",
+                    monitor.getCurrentFPS(), monitor.isDebugOverlayEnabled());
             } catch (Exception e) {
                 logger.warn("Debug export not available");
             }

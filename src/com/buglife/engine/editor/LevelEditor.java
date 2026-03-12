@@ -890,6 +890,8 @@ public class LevelEditor extends JFrame {
                 g2.setColor(Color.YELLOW);
                 g2.setStroke(new BasicStroke(3));
                 String type = entityTools.getSelectedEntityType();
+                // Show properties for selected entity
+                propertiesPanel.updateProperties(selected, type);
                 if (selected instanceof PointData) {
                     PointData p = (PointData) selected;
                     if (type.equals("spider")) {
@@ -954,11 +956,9 @@ public class LevelEditor extends JFrame {
             }
             
             // Draw tripwires
-            g2.setColor(new Color(255, 100, 100));
-            g2.setStroke(new BasicStroke(3));
             for (PointData tw : levelData.getTripwires()) {
-                g2.drawLine(tw.x - 20, tw.y, tw.x + 20, tw.y);
-                g2.drawLine(tw.x, tw.y - 5, tw.x, tw.y + 5);
+                g2.drawImage(tripwireSprite, tw.x - TILE_SIZE/2, tw.y - TILE_SIZE/2,
+                    TILE_SIZE, TILE_SIZE, null);
             }
             
             // Draw player spawn
