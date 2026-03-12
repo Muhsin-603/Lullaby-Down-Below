@@ -14,6 +14,7 @@ import com.buglife.main.GamePanel;
 import com.buglife.main.GameStateManager;
 import com.buglife.save.CloudSaveManager;
 import com.buglife.save.UserProfile;
+import com.buglife.telemetry.TelemetryRouter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -554,6 +555,9 @@ public class IdentifyState extends GameState {
         // Lock name into the session
         UserProfile.setActivePlayer(uppedName);
 
+        // Register with telemetry (SQL + Overseer/MongoDB)
+        TelemetryRouter.getInstance().identifyPlayer(uppedName);
+
         // Brief pause to show welcome, then menu
         new Thread(() -> {
             try {
@@ -593,6 +597,9 @@ public class IdentifyState extends GameState {
 
         // Lock name into the session
         UserProfile.setActivePlayer(name);
+
+        // Register with telemetry (SQL + Overseer/MongoDB)
+        TelemetryRouter.getInstance().identifyPlayer(name);
 
         // Transition
         new Thread(() -> {

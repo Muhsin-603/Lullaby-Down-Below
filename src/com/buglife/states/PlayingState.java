@@ -28,6 +28,7 @@ import com.buglife.levels.SpiderPatrolData;
 import com.buglife.main.GameStateManager;
 import com.buglife.save.SaveData;
 import com.buglife.save.SaveManager;
+import com.buglife.telemetry.TelemetryRouter;
 import com.buglife.utils.PerformanceMonitor;
 import com.buglife.world.World;
 
@@ -159,6 +160,11 @@ public class PlayingState extends GameState {
         isPaused = false;
 
         hasBeenInitialized = true;
+
+        // Start telemetry session and set level
+        TelemetryRouter telemetry = TelemetryRouter.getInstance();
+        telemetry.setCurrentLevel(currentLevel);
+        telemetry.startSession();
     }
 
     public void restart() {
@@ -176,6 +182,7 @@ public class PlayingState extends GameState {
                 break;
             }
         }
+        TelemetryRouter.getInstance().setCurrentLevel(levelName);
         this.hasBeenInitialized = false;
         init();
     }
@@ -257,6 +264,8 @@ public class PlayingState extends GameState {
 
             if (wire.checkCollision(player)) {
                 soundManager.playSound("webbed");
+                TelemetryRouter.getInstance().recordEvent("TRIPWIRE_HIT",
+                        (double) wire.getX(), (double) wire.getY());
 
                 Point noiseLocation = new Point(wire.getX() + 16, wire.getY() + 16);
                 int radius = wire.getSoundRadius();
@@ -285,6 +294,9 @@ public class PlayingState extends GameState {
             
         if (player.hasDiedFromWeb()) {
             logger.info("Game Over: Player died from webbed state");
+            TelemetryRouter.getInstance().recordDeath(
+                    player.getCenterX(), player.getCenterY(), "WEB_DEATH");
+            TelemetryRouter.getInstance().endSession();
             soundManager.stopSound("music");
             soundManager.stopSound("chasing");
             soundManager.playSound("gameOver");
@@ -309,6 +321,9 @@ public class PlayingState extends GameState {
                     
                     if (player.getHunger() <= 0) {
                         logger.info("Game Over: Player caught with zero hunger");
+                        TelemetryRouter.getInstance().recordDeath(
+                                player.getCenterX(), player.getCenterY(), "SPIDER_ZERO_HUNGER");
+                        TelemetryRouter.getInstance().endSession();
                         soundManager.stopSound("music");
                         soundManager.stopSound("chasing");
                         soundManager.playSound("gameOver");
@@ -319,6 +334,9 @@ public class PlayingState extends GameState {
                     if (currentSpider.isChasing()) {
                         if (player.isCrying()) {
                             logger.info("Game Over: Player caught by spider while crying");
+                            TelemetryRouter.getInstance().recordDeath(
+                                    player.getCenterX(), player.getCenterY(), "SPIDER_CRYING");
+                            TelemetryRouter.getInstance().endSession();
                             soundManager.stopSound("music");
                             soundManager.stopSound("chasing");
                             soundManager.playSound("gameOver");
@@ -351,6 +369,8 @@ public class PlayingState extends GameState {
             if (distanceFood < requiredDistanceFood) {
                 player.eat(currFood);
                 soundManager.playSound("eat");
+                TelemetryRouter.getInstance().recordEvent("FOOD_EATEN",
+                        (double) currFood.getCenterX(), (double) currFood.getCenterY());
                 foods.remove(i);
             }
         }
@@ -358,10 +378,16 @@ public class PlayingState extends GameState {
         if (player.isOnLevelCompleteTile()) {
             soundManager.stopAllSounds();
             soundManager.playSound("level_complete");
+            TelemetryRouter.getInstance().recordEvent("LEVEL_COMPLETE",
+                    (double) player.getCenterX(), (double) player.getCenterY());
+            TelemetryRouter.getInstance().endSession();
             manager.setState(GameStateManager.LEVEL_COMPLETE);
             return;
         }
         if (player.getHunger() <= 0 && !player.isCrying()) {
+            TelemetryRouter.getInstance().recordDeath(
+                    player.getCenterX(), player.getCenterY(), "STARVATION");
+            TelemetryRouter.getInstance().endSession();
             soundManager.stopSound("music");
             soundManager.playSound("chasing");
             soundManager.playSound("gameOver");
@@ -807,6 +833,9 @@ public class PlayingState extends GameState {
                 // === THE RAGE QUIT SAVE ===
                 // Emergency save of exact coordinates before quitting
                 saveCurrentState();
+                TelemetryRouter.getInstance().recordEvent("RAGE_QUIT",
+                        (double) player.getCenterX(), (double) player.getCenterY());
+                TelemetryRouter.getInstance().endSession();
                 logger.info("Rage quit save completed");
                 manager.setState(GameStateManager.MENU);
             }

@@ -19,6 +19,7 @@ import com.buglife.config.ConfigManager;
 import com.buglife.config.GameConstants;
 import com.buglife.save.SaveManager;
 import com.buglife.save.UserProfile;
+import com.buglife.telemetry.TelemetryRouter;
 import com.buglife.utils.PerformanceMonitor;
 
 public class Game implements Runnable {
@@ -146,6 +147,9 @@ public class Game implements Runnable {
 
         // Shutdown save manager (cloud services)
         SaveManager.shutdown();
+
+        // Shutdown telemetry (SQL + Overseer/MongoDB)
+        TelemetryRouter.getInstance().shutdown();
 
         try {
             if (gameThread != null && gameThread.isAlive()) {
