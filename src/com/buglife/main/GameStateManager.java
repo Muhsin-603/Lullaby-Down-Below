@@ -10,9 +10,10 @@ import com.buglife.states.PlayingState;
 import com.buglife.states.SettingsState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.buglife.states.LoadingScreenState;
 import com.buglife.states.GameOverState;
 import com.buglife.states.LevelCompleteState;
+import com.buglife.states.LeaderboardState;
 
 public class GameStateManager {
     private static final Logger logger = LoggerFactory.getLogger(GameStateManager.class);
@@ -36,7 +37,7 @@ public class GameStateManager {
     private IdentifyState identifyState;
     private MenuState menuState;
     private PlayingState playingState;
-
+    private LeaderboardState leaderboardState;
     private GameOverState gameOverState;
     private SettingsState settingsState;
     private LevelCompleteState levelCompleteState;
