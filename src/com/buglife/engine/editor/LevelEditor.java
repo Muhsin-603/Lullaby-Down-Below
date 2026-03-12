@@ -51,7 +51,7 @@ public class LevelEditor extends JFrame {
     private TilePalette tilePalette;
     private ValidationPanel validationPanel;
     private EntityPanel entityPanel;
-    @SuppressWarnings("unused")
+    
     private PropertiesPanel propertiesPanel;
     private JLabel statusLabel;
     private JLabel coordinateLabel;
