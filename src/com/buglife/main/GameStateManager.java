@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.buglife.states.LoadingScreenState;
 import com.buglife.states.GameOverState;
 import com.buglife.states.LevelCompleteState;
-import com.buglife.states.LeaderboardState;
 
 public class GameStateManager {
     private static final Logger logger = LoggerFactory.getLogger(GameStateManager.class);
@@ -103,6 +102,9 @@ public class GameStateManager {
                 break;
             case IDENTIFY:
                 currentState = identifyState;
+                break;
+            case LEADERBOARD:
+                currentState = leaderboardState;
                 break;
             case LOADING:
                 currentState = loadingState;

@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.buglife.config.ConfigManager;
-import com.buglife.telemetry.DatabaseManager;
 
 /**
  * TelemetryClient — The Scribe of the Vault.

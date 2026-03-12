@@ -284,10 +284,12 @@ public class DebugOverlay {
      */
     private static int drawControlsReference(Graphics2D g, int x, int y) {
         g.setFont(SMALL_FONT);
+        FontMetrics fm = g.getFontMetrics();
         g.setColor(new Color(150, 150, 150));
-        g.drawString("[F3] Overlay  [F4] Hitboxes  [F6] Paths  [F7] God Mode", x, y);
+        String controls = "[F3] Overlay  [F4] Hitboxes  [F6] Paths  [F7] God Mode";
+        g.drawString(controls, x, y);
         
-        y += LINE_HEIGHT - 2;
+        y += fm.getHeight();
         
         return y;
     }

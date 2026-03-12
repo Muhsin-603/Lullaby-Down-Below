@@ -1473,8 +1473,8 @@ public class MapPreviewTool extends JFrame {
                     int x = pos.x * previewTileSize + previewTileSize / 2 - panX;
                     int y = pos.y * previewTileSize + previewTileSize / 2 - panY;
                     
-                    // Different colors for food types
-                    if (food.getType().name().equals("ENERGY_SEED")) {
+                    // Different colors for food types (using Food.FoodType enum for type safety)
+                    if (food.getType() == Food.FoodType.ENERGY_SEED) {
                         g.setColor(new Color(100, 255, 100, 200));
                     } else {
                         g.setColor(new Color(255, 255, 0, 200));

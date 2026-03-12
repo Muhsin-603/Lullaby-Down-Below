@@ -73,7 +73,7 @@ public class Level5Config implements LevelConfig {
     
     @Override
     public List<Point> getTripWirePositions() {
-        return Arrays.asList(
+        return Collections.unmodifiableList(Arrays.asList(
             // Bottom section
             new Point(200, 2592),
             new Point(500, 2624),
@@ -115,7 +115,7 @@ public class Level5Config implements LevelConfig {
             // Near exit
             new Point(600, 288),
             new Point(1000, 256)
-        );
+        ));
     }
     
     // ============================================================

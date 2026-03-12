@@ -152,7 +152,10 @@ public class LeaderboardState extends GameState {
         // === TITLE: "HALL OF INFAMY" ===
         g.setFont(titleFont);
         int pulse = 180 + (int)(75 * Math.sin(glowPulse * 0.04));
-        g.setColor(new Color(pulse, pulse / 3, 0)); // amber/orange glow
+        // Flicker effect using flickerTimer — brief dimming every ~120 frames
+        boolean flicker = (flickerTimer % 120 < 3);
+        int titleAlpha = flicker ? 80 : 255;
+        g.setColor(new Color(pulse, pulse / 3, 0, titleAlpha)); // amber/orange glow with flicker
         String title = "HALL OF INFAMY";
         int titleWidth = g.getFontMetrics().stringWidth(title);
         g.drawString(title, (w - titleWidth) / 2, 75);
@@ -182,11 +185,13 @@ public class LeaderboardState extends GameState {
             int lw = g.getFontMetrics().stringWidth(loading);
             g.drawString(loading, (w - lw) / 2, h / 2);
         } else if (entries.isEmpty()) {
-            g.setFont(statusFont);
-            g.setColor(new Color(150, 100, 50, 180));
-            String empty = "- EMPTY -";
-            int ew = g.getFontMetrics().stringWidth(empty);
-            g.drawString(empty, (w - ew) / 2, h / 2);
+            if (fetchComplete) {
+                g.setFont(statusFont);
+                g.setColor(new Color(150, 100, 50, 180));
+                String empty = "- EMPTY -";
+                int ew = g.getFontMetrics().stringWidth(empty);
+                g.drawString(empty, (w - ew) / 2, h / 2);
+            }
         } else {
             drawTable(g, w, h);
         }
@@ -279,6 +284,7 @@ public class LeaderboardState extends GameState {
 
     @Override
     public void keyPressed(int keyCode) {
+        soundManager.playSound("menu");
         switch (keyCode) {
             case KeyEvent.VK_ESCAPE:
             case KeyEvent.VK_ENTER:

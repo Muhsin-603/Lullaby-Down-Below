@@ -255,7 +255,7 @@ public class IdentifyState extends GameState {
             // Still loading or empty
             g.setFont(statusFont);
             g.setColor(new Color(0, 150, 0, 150));
-            String msg = fetchInProgress ? "LOADING..." : "NO NAMES ON FILE";
+            String msg = fetchInProgress ? "LOADING..." : (fetchComplete ? "NO NAMES ON FILE" : "WAITING...");
             int msgW = g.getFontMetrics().stringWidth(msg);
             g.drawString(msg, (w - msgW) / 2, h / 2);
         } else {
@@ -431,6 +431,7 @@ public class IdentifyState extends GameState {
                     rosterSelection--;
                     ensureVisible(rosterSelection);
                 }
+                soundManager.playSound("menu");
                 statusMessage = "";
                 break;
 
@@ -442,6 +443,7 @@ public class IdentifyState extends GameState {
                     // Move focus to NEW VICTIM button
                     rosterSelection = -1;
                 }
+                soundManager.playSound("menu");
                 statusMessage = "";
                 break;
 

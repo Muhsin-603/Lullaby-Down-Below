@@ -73,7 +73,7 @@ public class Level4Config implements LevelConfig {
     
     @Override
     public List<Point> getTripWirePositions() {
-        return Arrays.asList(
+        return Collections.unmodifiableList(Arrays.asList(
             // Bottom corridor tripwires
             new Point(400, 2560),
             new Point(700, 2560),
@@ -92,7 +92,7 @@ public class Level4Config implements LevelConfig {
             // Near exit area
             new Point(600, 640),
             new Point(1000, 512)
-        );
+        ));
     }
     
     // ============================================================

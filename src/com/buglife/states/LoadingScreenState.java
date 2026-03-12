@@ -111,7 +111,12 @@ public class LoadingScreenState extends GameState {
 
     @Override
     public void keyPressed(int keyCode) {
-        // Ignore key presses during loading
+        if (keyCode == KeyEvent.VK_ESCAPE) {
+            // Allow cancelling loading and returning to menu
+            logger.info("Loading cancelled by user");
+            soundManager.stopAllSounds();
+            manager.setState(GameStateManager.MENU);
+        }
     }
 
     @Override
