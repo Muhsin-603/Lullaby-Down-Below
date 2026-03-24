@@ -2,7 +2,7 @@ package com.buglife.main;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
-import java.awt.GraphicsDevice;
+//import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.io.IOException;
@@ -64,9 +64,8 @@ public class Game implements Runnable {
         window.add(gamePanel);
 
         // 4. Set the window to fullscreen
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gd = ge.getDefaultScreenDevice();
-        gd.setFullScreenWindow(window); // This also makes the window visible
+        window.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+        window.setVisible(true);// This also makes the window visible
 
         // 5. CRITICAL: Request keyboard focus AFTER the window is visible/fullscreen.
         // This is the most reliable way to ensure key presses are heard.
